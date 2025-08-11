@@ -37,3 +37,8 @@ Recommended for readers looking for sweeping political intrigue.
 A fast, tactical sci-fi about a child prodigy shaped by relentless war games to defend humanity.
 Recommended for readers looking for high-velocity strategy and thought-provoking ethical dilemmas.
 ```
+
+## Language Features
+
+- Supports all but niche Markdown features, minus `#` headings and indented blocks
+- Supports `//` comments
