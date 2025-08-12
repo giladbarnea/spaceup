@@ -78,7 +78,7 @@ def test_parser_with_end_of_document_paragraph():
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(end_of_document_paragraph_input)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
-    assert expected_structured_html == actual_structured_html
+    assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
 
 
 def test_parser_with_two_indentation_levels():
