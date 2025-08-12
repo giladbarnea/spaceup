@@ -327,10 +327,21 @@ def test_parser_with_markdown_features():
     expected_html = textwrap.dedent("""
         <h1>My Favorite Recipe</h1>
         <h2>Ingredients</h2>
+        <ul>
+            <li>2 cups flour</li>
+            <li>1 cup sugar</li>
+            <li><strong>1 tsp</strong> baking powder</li>
+        </ul>
         <p>
-            <div>- 2 cups flour</div>
-            <div>- 1 cup sugar</div>
-            <div>- **1 tsp** baking powder</div>
+            <div>Mix them well.</div>
+        </p>
+        <h2>Instructions</h2>
+        <p>
+            <div>Preheat oven to 350°F.</div>
+            <div>Bake for 20 minutes.</div>
+        </p>
+        <p>
+            <div>Enjoy your <a href="https://example.com/recipe">cake</a>!</div>
         </p>
     """)
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
