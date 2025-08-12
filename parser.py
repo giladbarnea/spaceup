@@ -1,3 +1,6 @@
+import mistune
+
+
 def parse_spaceup(input_str):
     """Parse Spaceup markup into HTML."""
     lines = [line.rstrip() for line in input_str.splitlines()]  # Clean trailing whitespace
@@ -19,27 +22,51 @@ def parse_spaceup(input_str):
                 return indent
         return -1  # EOF, use -1 to indicate
     
+    def render_inline_markdown(text: str) -> str:
+        html = mistune.html(text).strip()
+        if html.startswith('<p>') and html.endswith('</p>'):
+            html = html[3:-4]
+        return html
+
     def emit_paragraph(text_lines):
         if not text_lines:
             return
         def render_div(item):
             if isinstance(item, tuple):
                 text, comment = item
+                rendered = render_inline_markdown(text)
                 if comment:
-                    return f'<div>{text}  <!-- {comment} --></div>'
-                return f'<div>{text}</div>'
-            return f'<div>{item}</div>'
+                    return f'<div>{rendered}  <!-- {comment} --></div>'
+                return f'<div>{rendered}</div>'
+            return f'<div>{render_inline_markdown(str(item))}</div>'
 
         divs = '\n'.join(render_div(line) for line in text_lines)
         output.append('<p>')
         output.append(divs)
         output.append('</p>')
 
+    def emit_list(items):
+        if not items:
+            return
+        lis = '\n'.join(f'<li>{render_inline_markdown(text)}</li>' for text in items)
+        output.append('<ul>')
+        output.append(lis)
+        output.append('</ul>')
+
     def split_content_and_inline_comment(text):
         stripped = text.lstrip()
-        if '//' in stripped:
-            before, after = stripped.split('//', 1)
-            return before.strip(), after.strip()
+        search_start = 0
+        while True:
+            idx = stripped.find('//', search_start)
+            if idx == -1:
+                break
+            if idx == 0:
+                # Comment-only lines are handled elsewhere; skip here
+                search_start = idx + 2
+                continue
+            if stripped[idx - 1].isspace():
+                return stripped[:idx].rstrip(), stripped[idx + 2 :].strip()
+            search_start = idx + 2
         return stripped.strip(), None
 
     def extract_comment_only(text):
@@ -119,6 +146,23 @@ def parse_spaceup(input_str):
                 indent_stack.pop()
             else:
                 # Paragraph: collect consecutive lines at same indent
+                # But first, detect unordered list starting with "- "
+                if content.startswith('- '):
+                    items = [content[2:].strip()]
+                    pos += 1
+                    while pos < len(lines):
+                        next_line_indent = compute_indent(lines[pos])
+                        if next_line_indent != indent:
+                            break
+                        next_content, _next_comment = split_content_and_inline_comment(lines[pos])
+                        if not next_content.startswith('- '):
+                            break
+                        items.append(next_content[2:].strip())
+                        pos += 1
+                    emit_list(items)
+                    previous_non_whitespace_indent = indent
+                    continue
+
                 para_lines = [(content, inline_comment)]
                 pos += 1
                 while pos < len(lines):
