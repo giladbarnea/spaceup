@@ -411,6 +411,9 @@ def test_parser_with_full_example_and_markdown_in_paragraphs():
 
             here is a new line with 1 indentation, preceded by a blank line, BUT, next non-WS non comment element has a greater indentation level. Therefore, this is a H2. 
 
+                - First step: mix ingredients
+                - Use **butter** and [sugar](https://example.com/sugar)
+
                 Some paragraph opener under the H2 heading from before, with an indentation level of 2, and a link to [docs](https://example.com/docs).
                 Lorem ipsum a new div in the same paragraph because no blank line before it and indent level is also 2 with **strong** text.
 
@@ -419,7 +422,7 @@ def test_parser_with_full_example_and_markdown_in_paragraphs():
             Back to indentation level 1. Note that the next line has a greater indentation than the current one. This necessarily makes this line a heading.
                 This line has indentation level 2. Because 1 is LOWER THAN 2, the previous line is a heading (h2), and since the next element has a LOWER indentation level, this is a paragraph start with a single div.
 
-            Back to indentation level 1. Next line has the same indentation.
+            Back to indentation level 1. Next line has the same indentation with *italic* and a link to [spec](https://example.com/spec).
             Here is another line, right afterwards, with the SAME indentation level (1). This is a special case; read the comment below.
             // This text block is the first example where the two following conditions occur:
             // 1. indentation went DOWN (previous non-ws non-comment element was 2; now it's 1), and
@@ -438,6 +441,10 @@ def test_parser_with_full_example_and_markdown_in_paragraphs():
             <div>even some more text with 1 indentation, preceded by a blank line, and next non-whitespace, non-comment element has indentation LOWER OR EQUAL to this one  --> this is a paragraph open.</div>
         </p>
         <h2>here is a new line with 1 indentation, preceded by a blank line, BUT, next non-WS non comment element has a greater indentation level. Therefore, this is a H2.</h2>
+        <ul>
+            <li>First step: mix ingredients</li>
+            <li>Use <strong>butter</strong> and <a href="https://example.com/sugar">sugar</a></li>
+        </ul>
         <p>
             <div>Some paragraph opener under the H2 heading from before, with an indentation level of 2, and a link to <a href="https://example.com/docs">docs</a>.</div>
             <div>Lorem ipsum a new div in the same paragraph because no blank line before it and indent level is also 2 with <strong>strong</strong> text.</div>
@@ -449,7 +456,7 @@ def test_parser_with_full_example_and_markdown_in_paragraphs():
         <p>
             <div>This line has indentation level 2. Because 1 is LOWER THAN 2, the previous line is a heading (h2), and since the next element has a LOWER indentation level, this is a paragraph start with a single div.</div>
         </p>
-        <h2>Back to indentation level 1. Next line has the same indentation.</h2>
+        <h2>Back to indentation level 1. Next line has the same indentation with <em>italic</em> and a link to <a href="https://example.com/spec">spec</a>.</h2>
         <p>
             <div>Here is another line, right afterwards, with the SAME indentation level (1). This is a special case; read the comment below.</div>
         </p>
