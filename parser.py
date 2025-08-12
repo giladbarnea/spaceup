@@ -5,6 +5,7 @@ def parse_spaceup(input_str):
     indent_stack = [0]  # Start with root level 0
     output = []
     pos = 0
+    prev_non_ws_indent = 0
     
     def compute_indent(line):
         stripped = line.lstrip()
@@ -21,6 +22,7 @@ def parse_spaceup(input_str):
     
     def parse_element(current_indent):
         nonlocal pos
+        nonlocal prev_non_ws_indent
         while pos < len(lines):
             while pos < len(lines) and compute_indent(lines[pos]) is None:
                 pos += 1  # Skip blanks and comments
@@ -49,16 +51,35 @@ def parse_spaceup(input_str):
                     has_blank_before_next = True
             
             is_heading = False
-            if next_indent > indent or (next_indent == indent and has_blank_before_next):
+            ambiguous_decrease = (
+                prev_non_ws_indent > indent and next_indent == indent and not has_blank_before_next
+            )
+            if next_indent > indent or (next_indent == indent and has_blank_before_next) or ambiguous_decrease:
                 is_heading = True  # Heading if next is greater or same with blank separation
-            elif next_indent == indent and len(indent_stack) > 1 and indent < indent_stack[-1]:
-                is_heading = True  # Forced heading exception for decreased indent with same next
             
             heading_level = len(indent_stack)
             if is_heading:
                 output.append(f'<h{heading_level}>{content}</h{heading_level}>')
+                prev_non_ws_indent = indent
                 indent_stack.append(indent)
                 pos += 1
+                # Handle ambiguous decrease: force subsequent same-indented lines as children
+                if ambiguous_decrease:
+                    forced_para_lines = []
+                    while pos < len(lines):
+                        nindent = compute_indent(lines[pos])
+                        if nindent is None or nindent != indent:
+                            break
+                        next_content = lines[pos].lstrip().split('//', 1)[0].strip()
+                        if next_content:
+                            forced_para_lines.append(next_content)
+                            prev_non_ws_indent = indent
+                        pos += 1
+                    if forced_para_lines:
+                        divs = '\n'.join(f'<div>{line}</div>' for line in forced_para_lines)
+                        output.append('<p>')
+                        output.append(divs)
+                        output.append('</p>')
                 parse_element(indent + 1)  # Recurse for content with greater indent
                 indent_stack.pop()
             else:
@@ -74,12 +95,14 @@ def parse_spaceup(input_str):
                         pos += 1
                         continue
                     para_lines.append(next_content)
+                    prev_non_ws_indent = indent
                     pos += 1
                 if para_lines:
                     divs = '\n'.join(f'<div>{line}</div>' for line in para_lines)
                     output.append('<p>')
                     output.append(divs)
                     output.append('</p>')
+                    prev_non_ws_indent = indent
     
     parse_element(0)
     return '\n'.join(output)
