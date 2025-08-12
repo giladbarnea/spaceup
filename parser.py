@@ -22,20 +22,49 @@ def parse_spaceup(input_str):
     def emit_paragraph(text_lines):
         if not text_lines:
             return
-        divs = '\n'.join(f'<div>{line}</div>' for line in text_lines)
+        def render_div(item):
+            if isinstance(item, tuple):
+                text, comment = item
+                if comment:
+                    return f'<div>{text}  <!-- {comment} --></div>'
+                return f'<div>{text}</div>'
+            return f'<div>{item}</div>'
+
+        divs = '\n'.join(render_div(line) for line in text_lines)
         output.append('<p>')
         output.append(divs)
         output.append('</p>')
 
-    def strip_inline_comment(text):
-        return text.lstrip().split('//', 1)[0].strip()
+    def split_content_and_inline_comment(text):
+        stripped = text.lstrip()
+        if '//' in stripped:
+            before, after = stripped.split('//', 1)
+            return before.strip(), after.strip()
+        return stripped.strip(), None
+
+    def extract_comment_only(text):
+        stripped = text.lstrip()
+        if stripped.startswith('//'):
+            return stripped[2:].strip()
+        return None
 
     def parse_element(current_indent):
         nonlocal pos
         nonlocal previous_non_whitespace_indent
         while pos < len(lines):
-            while pos < len(lines) and compute_indent(lines[pos]) is None:
-                pos += 1  # Skip blanks and comments
+            # Skip blanks, but emit comment-only lines as HTML comments
+            while pos < len(lines):
+                stripped = lines[pos].lstrip()
+                if not stripped:
+                    pos += 1
+                    continue
+                if stripped.startswith('//'):
+                    comment_text = stripped[2:].strip()
+                    if comment_text:
+                        output.append(f'<!-- {comment_text} -->')
+                    pos += 1
+                    continue
+                break
             
             if pos >= len(lines):
                 return
@@ -45,8 +74,8 @@ def parse_spaceup(input_str):
             if indent < current_indent:
                 return  # Dedent
             
-            # Extract content, ignoring trailing comments
-            content = strip_inline_comment(line)
+            # Extract content and inline comment (if present)
+            content, inline_comment = split_content_and_inline_comment(line)
             if not content:
                 pos += 1
                 continue  # Skip if no content after stripping
@@ -80,9 +109,9 @@ def parse_spaceup(input_str):
                         nindent = compute_indent(lines[pos])
                         if nindent is None or nindent != indent:
                             break
-                        next_content = strip_inline_comment(lines[pos])
-                        if next_content:
-                            forced_para_lines.append(next_content)
+                        ncontent, ncomment = split_content_and_inline_comment(lines[pos])
+                        if ncontent:
+                            forced_para_lines.append((ncontent, ncomment))
                             previous_non_whitespace_indent = indent
                         pos += 1
                     emit_paragraph(forced_para_lines)
@@ -90,17 +119,17 @@ def parse_spaceup(input_str):
                 indent_stack.pop()
             else:
                 # Paragraph: collect consecutive lines at same indent
-                para_lines = [content]
+                para_lines = [(content, inline_comment)]
                 pos += 1
                 while pos < len(lines):
                     next_line_indent = compute_indent(lines[pos])
                     if next_line_indent != indent:
                         break
-                    next_content = strip_inline_comment(lines[pos])
+                    next_content, next_comment = split_content_and_inline_comment(lines[pos])
                     if not next_content:
                         pos += 1
                         continue
-                    para_lines.append(next_content)
+                    para_lines.append((next_content, next_comment))
                     previous_non_whitespace_indent = indent
                     pos += 1
                 emit_paragraph(para_lines)
