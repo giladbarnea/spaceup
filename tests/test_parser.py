@@ -303,3 +303,37 @@ def test_parser_with_full_example():
     parsed_spaceup = parse_spaceup(full_input)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
     assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
+
+
+def test_parser_with_markdown_features():
+    full_input = textwrap.dedent("""
+        My Favorite Recipe
+
+            Ingredients
+
+                - 2 cups flour
+                - 1 cup sugar
+                - **1 tsp** baking powder
+
+                Mix them well.
+
+            Instructions
+
+                Preheat oven to 350°F.
+                Bake for 20 minutes.
+
+                Enjoy your [cake](https://example.com/recipe)!
+    """)
+    expected_html = textwrap.dedent("""
+        <h1>My Favorite Recipe</h1>
+        <h2>Ingredients</h2>
+        <p>
+            <div>- 2 cups flour</div>
+            <div>- 1 cup sugar</div>
+            <div>- **1 tsp** baking powder</div>
+        </p>
+    """)
+    expected_structured_html = BeautifulSoup(expected_html, "html.parser")
+    parsed_spaceup = parse_spaceup(full_input)
+    actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
+    assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
