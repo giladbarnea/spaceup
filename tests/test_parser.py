@@ -224,7 +224,6 @@ def test_parser_with_ambiguous_decreasing_indentation_level():
     assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
 
 
-@pytest.mark.skip(reason="For next iteration")
 def test_parser_with_comments_sanity():
     full_input = textwrap.dedent("""
         text with 0 indentation
@@ -234,49 +233,46 @@ def test_parser_with_comments_sanity():
     expected_html = textwrap.dedent("""
         <h1>text with 0 indentation</h1>
         <p>
-            <div>text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know.  <!-- hint: the following non-WS, non-comment element's indentation level is LOWER OR EQUAL to this one; therefore this line is a paragraph open. --></div>
+            <div>text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know.  <!-- hint: the following non-WS, non-comment element's indentation level is LOWER OR EQUAL to this one; therefore, this line is a paragraph open. --></div>
             <div>another line with more text with 1 indentation.</div>
         </p>
     """)
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(full_input)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
-    assert expected_structured_html == actual_structured_html
+    assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
 
 
-@pytest.mark.skip(
-    reason="For next iteration (the comments sanity test should pass first)"
-)
 def test_parser_with_full_example():
     full_input = textwrap.dedent("""
         text with 0 indentation
 
-        text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know. // hint: the following non-WS, non-comment element's indentation level is LOWER OR EQUAL to this one; therefore, this line is a paragraph open.
-        another line with more text with 1 indentation.
+            text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know. // hint: the following non-WS, non-comment element's indentation level is LOWER OR EQUAL to this one; therefore, this line is a paragraph open.
+            another line with more text with 1 indentation.
 
-        even some more text with 1 indentation, preceded by a blank line, and next non-whitespace, non-comment element has indentation LOWER OR EQUAL to this one  --> this is a paragraph open.
+            even some more text with 1 indentation, preceded by a blank line, and next non-whitespace, non-comment element has indentation LOWER OR EQUAL to this one  --> this is a paragraph open.
 
-        here is a new line with 1 indentation, preceded by a blank line, BUT, next non-WS non comment element has a greater indentation level. Therefore, this is a H2. 
+            here is a new line with 1 indentation, preceded by a blank line, BUT, next non-WS non comment element has a greater indentation level. Therefore, this is a H2. 
 
-            Some paragraph opener under the H2 heading from before, with an indentation level of 2.
-            Lorem ipsum a new div in the same paragraph because no blank line before it and indent level is also 2.
+                Some paragraph opener under the H2 heading from before, with an indentation level of 2.
+                Lorem ipsum a new div in the same paragraph because no blank line before it and indent level is also 2.
 
-            Foo text after a blank line with same indentation (2) as the preceding text; it is another paragraph opener under the H2 from before.
+                Foo text after a blank line with same indentation (2) as the preceding text; it is another paragraph opener under the H2 from before.
 
-        Back to indentation level 1. Note that the next line has increased indentation.
-            This line has indentation level 2. Because 1 is LOWER THAN 2, the previous line is a heading (h2), and since the next element has a LOWER indentation level, this is a paragraph start with a single div.
+            Back to indentation level 1. Note that the next line has a greater indentation than the current one. This necessarily makes this line a heading.
+                This line has indentation level 2. Because 1 is LOWER THAN 2, the previous line is a heading (h2), and since the next element has a LOWER indentation level, this is a paragraph start with a single div.
 
-        Back to indentation level 1. Next line has the same indentation.
-        Here is another line, right afterwards, with the SAME indentation level (1). This is a special case; read the comment below.
-        // This text block is the first example where the two following conditions occur:
-        // 1. indentation went DOWN (previous non-ws non-comment element was 2; now it's 1), and
-        // 2. Two consecutive elements have the same indentation level (1), and going by rules above, the first line of this block — 'Back to indentation level 1' — shouldn't be a heading. But we have to make an exception here.
-        // In such an ambiguous, decreased-indentation case, where it's unclear how to parse the first line because the line which follows it shares the same indentation level, the first line is FORCED to become a heading. Subsequent lines in this block are forced to be indented. In effect, this makes this block with exactly the same structure as the one before it; an h2 line, followed by a paragraph starter.
+            Back to indentation level 1. Next line has the same indentation.
+            Here is another line, right afterwards, with the SAME indentation level (1). This is a special case; read the comment below.
+            // This text block is the first example where the two following conditions occur:
+            // 1. indentation went DOWN (previous non-ws non-comment element was 2; now it's 1), and
+            // 2. Two consecutive elements have the same indentation level (1), and going by rules, the first line of this block — 'Back to indentation level 1' — shouldn't be a heading. But we have to make an exception here.
+            // In such an ambiguous, decreased-indentation case, where it's unclear how to parse the first line because the line which follows it shares the same indentation level, the first line is FORCED to become a heading. Subsequent lines in this block are forced to be indented. In effect, this makes this block with exactly the same structure as the one before it; an h2 line, followed by a paragraph starter.
     """)
     expected_html = textwrap.dedent("""
         <h1>text with 0 indentation</h1>
         <p>
-            <div>text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know.  <!-- hint: the following non-WS, non-comment element's indentation level is LOWER OR EQUAL to this one; therefore this line is a paragraph open. --></div>
+            <div>text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know.  <!-- hint: the following non-WS, non-comment element's indentation level is LOWER OR EQUAL to this one; therefore, this line is a paragraph open. --></div>
             <div>another line with more text with 1 indentation.</div>
         </p>
         <p>
@@ -290,7 +286,7 @@ def test_parser_with_full_example():
         <p>
             <div>Foo text after a blank line with same indentation (2) as the preceding text; it is another paragraph opener under the H2 from before.</div>
         </p>
-        <h2>Back to indentation level 1. Note that the next line has increased indentation.</h2>
+        <h2>Back to indentation level 1. Note that the next line has a greater indentation than the current one. This necessarily makes this line a heading.</h2>
         <p>
             <div>This line has indentation level 2. Because 1 is LOWER THAN 2, the previous line is a heading (h2), and since the next element has a LOWER indentation level, this is a paragraph start with a single div.</div>
         </p>
@@ -300,10 +296,10 @@ def test_parser_with_full_example():
         </p>
         <!-- This text block is the first example where the two following conditions occur: -->
         <!-- 1. indentation went DOWN (previous non-ws non-comment element was 2; now it's 1), and -->
-        <!-- 2. Two consecutive elements have the same indentation level (1), and going by rules above, the first line of this block — 'Back to indentation level 1' — shouldn't be a heading. But we have to make an exception here. -->
+        <!-- 2. Two consecutive elements have the same indentation level (1), and going by rules, the first line of this block — 'Back to indentation level 1' — shouldn't be a heading. But we have to make an exception here. -->
         <!-- In such an ambiguous, decreased-indentation case, where it's unclear how to parse the first line because the line which follows it shares the same indentation level, the first line is FORCED to become a heading. Subsequent lines in this block are forced to be indented. In effect, this makes this block with exactly the same structure as the one before it; an h2 line, followed by a paragraph starter. -->
     """)
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(full_input)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
-    assert expected_structured_html == actual_structured_html
+    assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
