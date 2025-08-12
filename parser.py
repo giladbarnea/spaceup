@@ -125,7 +125,8 @@ def parse_spaceup(input_str):
             
             heading_level = len(indent_stack)
             if is_heading:
-                output.append(f'<h{heading_level}>{content}</h{heading_level}>')
+                rendered_heading = render_inline_markdown(content)
+                output.append(f'<h{heading_level}>{rendered_heading}</h{heading_level}>')
                 previous_non_whitespace_indent = indent
                 indent_stack.append(indent)
                 pos += 1
