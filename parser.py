@@ -56,8 +56,7 @@ def parse_spaceup(input_str):
             
             heading_level = len(indent_stack)
             if is_heading:
-                rendered = mistune.html(content)  # Use mistune for Markdown
-                output.append(f'<h{heading_level}>{rendered}</h{heading_level}>')
+                output.append(f'<h{heading_level}>{content}</h{heading_level}>')
                 indent_stack.append(indent)
                 pos += 1
                 parse_element(indent + 1)  # Recurse for content with greater indent
@@ -77,9 +76,10 @@ def parse_spaceup(input_str):
                     para_lines.append(next_content)
                     pos += 1
                 if para_lines:
-                    para_text = '\n'.join(para_lines)
-                    rendered = mistune.html(para_text)  # Render as Markdown (handles lists, etc.)
-                    output.append(f'<p>{rendered}</p>')
+                    divs = '\n'.join(f'<div>{line}</div>' for line in para_lines)
+                    output.append('<p>')
+                    output.append(divs)
+                    output.append('</p>')
     
     parse_element(0)
     return '\n'.join(output)

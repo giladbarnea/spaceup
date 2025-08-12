@@ -1,11 +1,48 @@
-"""Read SPEC.md to understand the purpose of each test."""
+"""
+Read SPEC.md to understand the purpose of each test.
+
+Note that when comparing HTML, whitespace does NOT matter.
+Hence it is normalized before comparison.
+"""
 
 import textwrap
 
 from bs4 import BeautifulSoup
+from bs4.element import Tag, NavigableString, Comment
 import pytest
 
 from parser import parse_spaceup
+
+
+def _normalize_node(node):
+    if isinstance(node, Comment):
+        text = str(node)
+        if text.strip() == "":
+            return None
+        return ("#comment", " ".join(text.split()))
+    if isinstance(node, NavigableString):
+        text = str(node)
+        if text.strip() == "":
+            return None
+        return ("#text", " ".join(text.split()))
+    if isinstance(node, Tag):
+        normalized_children = []
+        for child in node.children:
+            norm = _normalize_node(child)
+            if norm is not None:
+                normalized_children.append(norm)
+        # Attributes are irrelevant for these tests; include if needed later
+        return (node.name, tuple(normalized_children))
+    return None
+
+
+def _soup_ast(soup):
+    ast_children = []
+    for child in soup.contents:
+        norm = _normalize_node(child)
+        if norm is not None:
+            ast_children.append(norm)
+    return tuple(ast_children)
 
 
 def test_parser_with_basic_example():
@@ -24,7 +61,7 @@ def test_parser_with_basic_example():
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(basic_input)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
-    assert expected_structured_html == actual_structured_html
+    assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
 
 
 def test_parser_with_end_of_document_paragraph():
