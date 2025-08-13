@@ -10,7 +10,7 @@ import textwrap
 from bs4 import BeautifulSoup
 from bs4.element import Tag, NavigableString, Comment
 
-from ast_parser import parse_spaceup_ast, render_ast_to_html
+from ast_parser import parse_spaceup_ast#, render_ast_to_html
 
 
 def _normalize_node(node):
