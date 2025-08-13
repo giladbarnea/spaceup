@@ -31,18 +31,17 @@ def parse_spaceup(input_str):
     def emit_paragraph(text_lines):
         if not text_lines:
             return
-        def render_div(item):
+        output.append('<p>')
+        for item in text_lines:
             if isinstance(item, tuple):
                 text, comment = item
                 rendered = render_inline_markdown(text)
                 if comment:
-                    return f'<div>{rendered}  <!-- {comment} --></div>'
-                return f'<div>{rendered}</div>'
-            return f'<div>{render_inline_markdown(str(item))}</div>'
-
-        divs = '\n'.join(render_div(line) for line in text_lines)
-        output.append('<p>')
-        output.append(divs)
+                    output.append(f'{rendered}  <!-- {comment} --><br>')
+                else:
+                    output.append(f'{rendered}<br>')
+            else:
+                output.append(f'{render_inline_markdown(str(item))}<br>')
         output.append('</p>')
 
     def emit_list(items):
