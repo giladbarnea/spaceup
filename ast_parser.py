@@ -185,6 +185,46 @@ def parse_spaceup_ast(input_str: str) -> Document:
 
 
 def render_ast_to_html(ast: Document) -> str:
-    raise NotImplementedError
+    import mistune
+
+    def render_inline_md(text: str) -> str:
+        html = mistune.html(text).strip()
+        if html.startswith('<p>') and html.endswith('</p>'):
+            html = html[3:-4]
+        return html
+
+    output: List[str] = []
+
+    for node in ast.children:
+        if isinstance(node, Heading):
+            rendered = render_inline_md(node.content.text)
+            output.append(f"<h{node.level}>{rendered}</h{node.level}>")
+        elif isinstance(node, Paragraph):
+            # Detect simple unordered list paragraph (all lines start with '- ')
+            if node.lines and all(line.content.text.lstrip().startswith("- ") for line in node.lines):
+                output.append("<ul>")
+                for line in node.lines:
+                    item_text = line.content.text.lstrip()[2:].strip()
+                    output.append(f"    <li>{render_inline_md(item_text)}</li>")
+                output.append("</ul>")
+                continue
+
+            output.append("<p>")
+            for line in node.lines:
+                rendered = render_inline_md(line.content.text)
+                if line.inline_comment:
+                    output.append(f"    {rendered}  <!-- {line.inline_comment} --><br>")
+                else:
+                    output.append(f"    {rendered}<br>")
+            output.append("</p>")
+        elif isinstance(node, Comment):
+            # Top-level comments (not currently produced) – keep for completeness
+            if node.text:
+                output.append(f"<!-- {node.text} -->")
+        else:
+            # MarkdownBlock not used yet; fallback to paragraph rendering
+            pass
+
+    return "\n".join(output)
 
 

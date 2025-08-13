@@ -12,6 +12,7 @@ from bs4.element import Tag, NavigableString, Comment
 
 from ast_parser import (
     parse_spaceup_ast,
+    render_ast_to_html,
     Document,
     Heading,
     Paragraph,
@@ -87,17 +88,17 @@ def test_ast_parser_with_basic_example():
         ]
     )
     assert parsed_spaceup_ast == expected_ast
-    # expected_html = textwrap.dedent("""
-    #     <h1>text with 0 indentation</h1>
-    #     <p>
-    #         text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know.<br>
-    #         another line with more text with 1 indentation.<br>
-    #     </p>
-    # """)
-    # expected_structured_html = BeautifulSoup(expected_html, "html.parser")
-    # spaceup_html = render_ast_to_html(parsed_spaceup_ast)
-    # actual_structured_html = BeautifulSoup(spaceup_html, "html.parser")
-    # assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
+    expected_html = textwrap.dedent("""
+        <h1>text with 0 indentation</h1>
+        <p>
+            text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know.<br>
+            another line with more text with 1 indentation.<br>
+        </p>
+    """)
+    expected_structured_html = BeautifulSoup(expected_html, "html.parser")
+    spaceup_html = render_ast_to_html(parsed_spaceup_ast)
+    actual_structured_html = BeautifulSoup(spaceup_html, "html.parser")
+    assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
 
 
 def test_ast_parser_with_end_of_document_paragraph():
@@ -126,16 +127,16 @@ def test_ast_parser_with_end_of_document_paragraph():
         ]
     )
     assert parsed_spaceup_ast == expected_ast
-    # expected_html = textwrap.dedent("""
-    #     <h1>text with 0 indentation</h1>
-    #     <p>
-    #         text with 1 indentation. 1 is greater than the preceding 0, and that's the last element in the document (next is EOF) --> this text is a paragraph opener, and the preceding element is an h1.<br>
-    #     </p>
-    # """)
-    # expected_structured_html = BeautifulSoup(expected_html, "html.parser")
-    # spaceup_html = render_ast_to_html(parsed_spaceup_ast)
-    # actual_structured_html = BeautifulSoup(spaceup_html, "html.parser")
-    # assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
+    expected_html = textwrap.dedent("""
+        <h1>text with 0 indentation</h1>
+        <p>
+            text with 1 indentation. 1 is greater than the preceding 0, and that's the last element in the document (next is EOF) --> this text is a paragraph opener, and the preceding element is an h1.<br>
+        </p>
+    """)
+    expected_structured_html = BeautifulSoup(expected_html, "html.parser")
+    spaceup_html = render_ast_to_html(parsed_spaceup_ast)
+    actual_structured_html = BeautifulSoup(spaceup_html, "html.parser")
+    assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
 
 
 def test_ast_parser_with_two_indentation_levels():
@@ -184,28 +185,28 @@ def test_ast_parser_with_two_indentation_levels():
         ]
     )
     assert parsed_spaceup_ast == expected_ast
-    # expected_html = textwrap.dedent("""
-    #     <h1>text with 0 indentation</h1>
-    #     <p>
-    #         text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know.<br>
-    #         another line with more text with 1 indentation.<br>
-    #     </p>
-    #     <p>
-    #         even some more text with 1 indentation, preceded by a blank line, and next non-whitespace, non-comment element has indentation LOWER OR EQUAL to this one  --> this is a paragraph open.<br>
-    #     </p>
-    #     <h2>here is a new line with 1 indentation, preceded by a blank line, BUT, next non-WS non comment element has a greater indentation level. Therefore, this is a H2.</h2>
-    #     <p>
-    #         Some paragraph opener under the H2 heading from before, with an indentation level of 2.<br>
-    #         Lorem ipsum a new div in the same paragraph because no blank line before it and indent level is also 2.<br>
-    #     </p>
-    #     <p>
-    #         Foo text after a blank line with same indentation (2) as the preceding text; it is another paragraph opener under the H2 from before.<br>
-    #     </p>
-    # """)
-    # expected_structured_html = BeautifulSoup(expected_html, "html.parser")
-    # spaceup_html = render_ast_to_html(parsed_spaceup_ast)
-    # actual_structured_html = BeautifulSoup(spaceup_html, "html.parser")
-    # assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
+    expected_html = textwrap.dedent("""
+        <h1>text with 0 indentation</h1>
+        <p>
+            text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know.<br>
+            another line with more text with 1 indentation.<br>
+        </p>
+        <p>
+            even some more text with 1 indentation, preceded by a blank line, and next non-whitespace, non-comment element has indentation LOWER OR EQUAL to this one  --> this is a paragraph open.<br>
+        </p>
+        <h2>here is a new line with 1 indentation, preceded by a blank line, BUT, next non-WS non comment element has a greater indentation level. Therefore, this is a H2.</h2>
+        <p>
+            Some paragraph opener under the H2 heading from before, with an indentation level of 2.<br>
+            Lorem ipsum a new div in the same paragraph because no blank line before it and indent level is also 2.<br>
+        </p>
+        <p>
+            Foo text after a blank line with same indentation (2) as the preceding text; it is another paragraph opener under the H2 from before.<br>
+        </p>
+    """)
+    expected_structured_html = BeautifulSoup(expected_html, "html.parser")
+    spaceup_html = render_ast_to_html(parsed_spaceup_ast)
+    actual_structured_html = BeautifulSoup(spaceup_html, "html.parser")
+    assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
 
 
 def test_ast_parser_with_unambiguous_decreasing_indentation_level():
