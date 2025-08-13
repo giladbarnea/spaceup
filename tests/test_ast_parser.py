@@ -10,7 +10,14 @@ import textwrap
 from bs4 import BeautifulSoup
 from bs4.element import Tag, NavigableString, Comment
 
-from ast_parser import parse_spaceup_ast#, render_ast_to_html
+from ast_parser import (
+    parse_spaceup_ast,
+    Document,
+    Heading,
+    Paragraph,
+    Div,
+    MarkdownInline,
+)
 
 
 def _normalize_node(node):
@@ -45,7 +52,7 @@ def _soup_ast(soup):
     return tuple(ast_children)
 
 def _assert_ast_equal(ast1, ast2):
-    ...
+    return ast1 == ast2
 
 def test_ast_parser_with_basic_example():
     basic_input = textwrap.dedent("""
@@ -54,7 +61,31 @@ def test_ast_parser_with_basic_example():
             another line with more text with 1 indentation.
     """)
     parsed_spaceup_ast = parse_spaceup_ast(basic_input)
-    expected_ast = ...
+    expected_ast = Document(
+        children=[
+            Heading(level=1, content=MarkdownInline(text="text with 0 indentation", tokens=[])),
+            Paragraph(
+                divs=[
+                    Div(
+                        content=MarkdownInline(
+                            text=(
+                                "text with 1 indentation. 1 is greater than the preceding 0, "
+                                "but we need to parse the next element before we know."
+                            ),
+                            tokens=[],
+                        ),
+                        inline_comment=None,
+                    ),
+                    Div(
+                        content=MarkdownInline(
+                            text="another line with more text with 1 indentation.", tokens=[]
+                        ),
+                        inline_comment=None,
+                    ),
+                ]
+            ),
+        ]
+    )
     assert _assert_ast_equal(parsed_spaceup_ast, expected_ast)
     # expected_html = textwrap.dedent("""
     #     <h1>text with 0 indentation</h1>
