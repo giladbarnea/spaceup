@@ -17,14 +17,8 @@ class MarkdownInline:
 
 
 @dataclass
-class Div:
-    content: MarkdownInline
-    inline_comment: Optional[str] = None
-
-
-@dataclass
 class Paragraph:
-    divs: List[Div]
+    lines: List["ParagraphLine"]
 
 
 @dataclass
@@ -42,6 +36,12 @@ class MarkdownBlock:
 @dataclass
 class Comment:
     text: str
+
+
+@dataclass
+class ParagraphLine:
+    content: MarkdownInline
+    inline_comment: Optional[str] = None
 
 
 Node = Union[Heading, Paragraph, MarkdownBlock, Comment]
@@ -143,27 +143,27 @@ def parse_spaceup_ast(input_str: str) -> Document:
                 pos += 1
                 if ambiguous_decrease:
                     # Force subsequent same-indented lines as paragraph content
-                    divs: List[Div] = []
+                    lines_accum: List[ParagraphLine] = []
                     while pos < len(lines):
                         nindent = compute_indent(lines[pos])
                         if nindent is None or nindent != indent:
                             break
                         ncontent, ncomment = split_content_and_inline_comment(lines[pos])
                         if ncontent:
-                            divs.append(
-                                Div(content=MarkdownInline(text=ncontent, tokens=[]), inline_comment=ncomment)
-                            )
+                            lines_accum.append(ParagraphLine(
+                                content=MarkdownInline(text=ncontent, tokens=[]), inline_comment=ncomment
+                            ))
                             previous_non_ws_indent = indent
                         pos += 1
-                    if divs:
-                        children.append(Paragraph(divs=divs))
+                    if lines_accum:
+                        children.append(Paragraph(lines=lines_accum))
                 # Recurse into deeper content
                 parse_block(indent + 1)
                 indent_stack.pop()
             else:
                 # Paragraph block: gather same-indented lines
-                divs: List[Div] = [
-                    Div(content=MarkdownInline(text=content_text, tokens=[]), inline_comment=inline_comment)
+                lines_accum: List[ParagraphLine] = [
+                    ParagraphLine(content=MarkdownInline(text=content_text, tokens=[]), inline_comment=inline_comment)
                 ]
                 pos += 1
                 while pos < len(lines):
@@ -172,12 +172,12 @@ def parse_spaceup_ast(input_str: str) -> Document:
                         break
                     ncontent, ncomment = split_content_and_inline_comment(lines[pos])
                     if ncontent:
-                        divs.append(
-                            Div(content=MarkdownInline(text=ncontent, tokens=[]), inline_comment=ncomment)
+                        lines_accum.append(
+                            ParagraphLine(content=MarkdownInline(text=ncontent, tokens=[]), inline_comment=ncomment)
                         )
                         previous_non_ws_indent = indent
                     pos += 1
-                children.append(Paragraph(divs=divs))
+                children.append(Paragraph(lines=lines_accum))
                 previous_non_ws_indent = indent
 
     parse_block(0)

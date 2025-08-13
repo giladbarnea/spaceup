@@ -15,8 +15,8 @@ from ast_parser import (
     Document,
     Heading,
     Paragraph,
-    Div,
     MarkdownInline,
+    ParagraphLine,
 )
 
 
@@ -65,8 +65,8 @@ def test_ast_parser_with_basic_example():
         children=[
             Heading(level=1, content=MarkdownInline(text="text with 0 indentation", tokens=[])),
             Paragraph(
-                divs=[
-                    Div(
+                lines=[
+                    ParagraphLine(
                         content=MarkdownInline(
                             text=(
                                 "text with 1 indentation. 1 is greater than the preceding 0, "
@@ -76,7 +76,7 @@ def test_ast_parser_with_basic_example():
                         ),
                         inline_comment=None,
                     ),
-                    Div(
+                    ParagraphLine(
                         content=MarkdownInline(
                             text="another line with more text with 1 indentation.", tokens=[]
                         ),
