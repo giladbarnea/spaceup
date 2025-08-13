@@ -86,7 +86,7 @@ def test_ast_parser_with_basic_example():
             ),
         ]
     )
-    assert _assert_ast_equal(parsed_spaceup_ast, expected_ast)
+    assert parsed_spaceup_ast == expected_ast
     # expected_html = textwrap.dedent("""
     #     <h1>text with 0 indentation</h1>
     #     <p>
@@ -125,7 +125,7 @@ def test_ast_parser_with_end_of_document_paragraph():
             ),
         ]
     )
-    assert _assert_ast_equal(parsed_spaceup_ast, expected_ast)
+    assert parsed_spaceup_ast == expected_ast
     # expected_html = textwrap.dedent("""
     #     <h1>text with 0 indentation</h1>
     #     <p>
@@ -183,7 +183,7 @@ def test_ast_parser_with_two_indentation_levels():
             ),
         ]
     )
-    assert _assert_ast_equal(parsed_spaceup_ast, expected_ast)
+    assert parsed_spaceup_ast == expected_ast
     # expected_html = textwrap.dedent("""
     #     <h1>text with 0 indentation</h1>
     #     <p>
@@ -262,7 +262,7 @@ def test_ast_parser_with_unambiguous_decreasing_indentation_level():
             ),
         ]
     )
-    assert _assert_ast_equal(parsed_spaceup_ast, expected_ast)
+    assert parsed_spaceup_ast == expected_ast
     # expected_html = textwrap.dedent("""
     #     <h1>text with 0 indentation</h1>
     #     <p>
@@ -356,7 +356,7 @@ def test_ast_parser_with_ambiguous_decreasing_indentation_level():
             ),
         ]
     )
-    assert _assert_ast_equal(parsed_spaceup_ast, expected_ast)
+    assert parsed_spaceup_ast == expected_ast
     # expected_html = textwrap.dedent("""
     #     <h1>text with 0 indentation</h1>
     #     <p>
@@ -415,7 +415,7 @@ def test_ast_parser_with_comments_sanity():
             ),
         ]
     )
-    assert _assert_ast_equal(parsed_spaceup_ast, expected_ast)
+    assert parsed_spaceup_ast == expected_ast
     # expected_html = textwrap.dedent("""
     #     <h1>text with 0 indentation</h1>
     #     <p>
@@ -501,7 +501,7 @@ def test_ast_parser_with_full_example():
             ),
         ]
     )
-    assert _assert_ast_equal(parsed_spaceup_ast, expected_ast)
+    assert parsed_spaceup_ast == expected_ast
     # expected_html = textwrap.dedent("""
     #     <h1>text with 0 indentation</h1>
     #     <p>
@@ -588,7 +588,7 @@ def test_ast_parser_with_markdown_features():
             ),
         ]
     )
-    assert _assert_ast_equal(parsed_spaceup_ast, expected_ast)
+    assert parsed_spaceup_ast == expected_ast
     # spaceup_html = render_ast_to_html(parsed_spaceup_ast)
     # actual_structured_html = BeautifulSoup(spaceup_html, "html.parser")
     # expected_html = textwrap.dedent("""
@@ -676,7 +676,7 @@ def test_ast_parser_with_markdown_features_and_comments():
             ),
         ]
     )
-    assert _assert_ast_equal(parsed_spaceup_ast, expected_ast)
+    assert parsed_spaceup_ast == expected_ast
     # expected_html = textwrap.dedent(
     #     """
     #     <h1>My Favorite Recipe</h1>
@@ -783,7 +783,7 @@ def test_ast_parser_with_full_example_and_markdown_in_paragraphs():
             ),
         ]
     )
-    assert _assert_ast_equal(parsed_spaceup_ast, expected_ast)
+    assert parsed_spaceup_ast == expected_ast
     # expected_html = textwrap.dedent(
     #     """
     #     <h1>text with 0 indentation</h1>
