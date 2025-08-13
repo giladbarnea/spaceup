@@ -106,7 +106,25 @@ def test_ast_parser_with_end_of_document_paragraph():
             text with 1 indentation. 1 is greater than the preceding 0, and that's the last element in the document (next is EOF) --> this text is a paragraph opener, and the preceding element is an h1.
     """)
     parsed_spaceup_ast = parse_spaceup_ast(end_of_document_paragraph_input)
-    expected_ast = ...
+    expected_ast = Document(
+        children=[
+            Heading(level=1, content=MarkdownInline(text="text with 0 indentation", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(
+                        content=MarkdownInline(
+                            text=(
+                                "text with 1 indentation. 1 is greater than the preceding 0, "
+                                "and that's the last element in the document (next is EOF) --> this text is a paragraph opener, and the preceding element is an h1."
+                            ),
+                            tokens=[],
+                        ),
+                        inline_comment=None,
+                    ),
+                ]
+            ),
+        ]
+    )
     assert _assert_ast_equal(parsed_spaceup_ast, expected_ast)
     # expected_html = textwrap.dedent("""
     #     <h1>text with 0 indentation</h1>
@@ -137,7 +155,34 @@ def test_ast_parser_with_two_indentation_levels():
                 Foo text after a blank line with same indentation (2) as the preceding text; it is another paragraph opener under the H2 from before.
     """)
     parsed_spaceup_ast = parse_spaceup_ast(full_input)
-    expected_ast = ...
+    expected_ast = Document(
+        children=[
+            Heading(level=1, content=MarkdownInline(text="text with 0 indentation", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know.", tokens=[]), inline_comment=None),
+                    ParagraphLine(content=MarkdownInline(text="another line with more text with 1 indentation.", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="even some more text with 1 indentation, preceded by a blank line, and next non-whitespace, non-comment element has indentation LOWER OR EQUAL to this one  --> this is a paragraph open.", tokens=[]), inline_comment=None)
+                ]
+            ),
+            Heading(level=2, content=MarkdownInline(text="here is a new line with 1 indentation, preceded by a blank line, BUT, next non-WS non comment element has a greater indentation level. Therefore, this is a H2.", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="Some paragraph opener under the H2 heading from before, with an indentation level of 2.", tokens=[]), inline_comment=None),
+                    ParagraphLine(content=MarkdownInline(text="Lorem ipsum a new div in the same paragraph because no blank line before it and indent level is also 2.", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="Foo text after a blank line with same indentation (2) as the preceding text; it is another paragraph opener under the H2 from before.", tokens=[]), inline_comment=None),
+                ]
+            ),
+        ]
+    )
     assert _assert_ast_equal(parsed_spaceup_ast, expected_ast)
     # expected_html = textwrap.dedent("""
     #     <h1>text with 0 indentation</h1>
@@ -183,7 +228,40 @@ def test_ast_parser_with_unambiguous_decreasing_indentation_level():
                 This line has indentation level 2. Because 1 is LOWER THAN 2, the previous line is a heading (h2), and since this is the end of the document, this is a paragraph start with a single div.
     """)
     parsed_spaceup_ast = parse_spaceup_ast(full_input)
-    expected_ast = ...
+    expected_ast = Document(
+        children=[
+            Heading(level=1, content=MarkdownInline(text="text with 0 indentation", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know.", tokens=[]), inline_comment=None),
+                    ParagraphLine(content=MarkdownInline(text="another line with more text with 1 indentation.", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="even some more text with 1 indentation, preceded by a blank line, and next non-whitespace, non-comment element has indentation LOWER OR EQUAL to this one  --> this is a paragraph open.", tokens=[]), inline_comment=None)
+                ]
+            ),
+            Heading(level=2, content=MarkdownInline(text="here is a new line with 1 indentation, preceded by a blank line, BUT, next non-WS non comment element has a greater indentation level. Therefore, this is a H2.", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="Some paragraph opener under the H2 heading from before, with an indentation level of 2.", tokens=[]), inline_comment=None),
+                    ParagraphLine(content=MarkdownInline(text="Lorem ipsum a new div in the same paragraph because no blank line before it and indent level is also 2.", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="Foo text after a blank line with same indentation (2) as the preceding text; it is another paragraph opener under the H2 from before.", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Heading(level=2, content=MarkdownInline(text="Back to indentation level 1. Note that the next line has a greater indentation than the current one. This necessarily makes this line a heading.", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="This line has indentation level 2. Because 1 is LOWER THAN 2, the previous line is a heading (h2), and since this is the end of the document, this is a paragraph start with a single div.", tokens=[]), inline_comment=None),
+                ]
+            ),
+        ]
+    )
     assert _assert_ast_equal(parsed_spaceup_ast, expected_ast)
     # expected_html = textwrap.dedent("""
     #     <h1>text with 0 indentation</h1>
@@ -238,7 +316,46 @@ def test_ast_parser_with_ambiguous_decreasing_indentation_level():
             Here is another line, right afterwards, with the SAME indentation level (1). This is a special case; read the comment below.
     """)
     parsed_spaceup_ast = parse_spaceup_ast(full_input)
-    expected_ast = ...
+    expected_ast = Document(
+        children=[
+            Heading(level=1, content=MarkdownInline(text="text with 0 indentation", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know.", tokens=[]), inline_comment=None),
+                    ParagraphLine(content=MarkdownInline(text="another line with more text with 1 indentation.", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="even some more text with 1 indentation, preceded by a blank line, and next non-whitespace, non-comment element has indentation LOWER OR EQUAL to this one  --> this is a paragraph open.", tokens=[]), inline_comment=None)
+                ]
+            ),
+            Heading(level=2, content=MarkdownInline(text="here is a new line with 1 indentation, preceded by a blank line, BUT, next non-WS non comment element has a greater indentation level. Therefore, this is a H2.", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="Some paragraph opener under the H2 heading from before, with an indentation level of 2.", tokens=[]), inline_comment=None),
+                    ParagraphLine(content=MarkdownInline(text="Lorem ipsum a new div in the same paragraph because no blank line before it and indent level is also 2.", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="Foo text after a blank line with same indentation (2) as the preceding text; it is another paragraph opener under the H2 from before.", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Heading(level=2, content=MarkdownInline(text="Back to indentation level 1. Note that the next line has a greater indentation than the current one. This necessarily makes this line a heading.", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="This line has indentation level 2. Because 1 is LOWER THAN 2, the previous line is a heading (h2), and since the next element has a LOWER indentation level, this is a paragraph start with a single div.", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Heading(level=2, content=MarkdownInline(text="Back to indentation level 1. Next line has the same indentation.", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="Here is another line, right afterwards, with the SAME indentation level (1). This is a special case; read the comment below.", tokens=[]), inline_comment=None),
+                ]
+            ),
+        ]
+    )
     assert _assert_ast_equal(parsed_spaceup_ast, expected_ast)
     # expected_html = textwrap.dedent("""
     #     <h1>text with 0 indentation</h1>
@@ -279,7 +396,25 @@ def test_ast_parser_with_comments_sanity():
             another line with more text with 1 indentation.
     """)
     parsed_spaceup_ast = parse_spaceup_ast(full_input)
-    expected_ast = ...
+    expected_ast = Document(
+        children=[
+            Heading(level=1, content=MarkdownInline(text="text with 0 indentation", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(
+                        content=MarkdownInline(text="text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know.", tokens=[]),
+                        inline_comment=(
+                            "hint: the following non-WS, non-comment element's indentation level is LOWER OR EQUAL to this one; therefore, this line is a paragraph open."
+                        ),
+                    ),
+                    ParagraphLine(
+                        content=MarkdownInline(text="another line with more text with 1 indentation.", tokens=[]),
+                        inline_comment=None,
+                    ),
+                ]
+            ),
+        ]
+    )
     assert _assert_ast_equal(parsed_spaceup_ast, expected_ast)
     # expected_html = textwrap.dedent("""
     #     <h1>text with 0 indentation</h1>
@@ -321,7 +456,51 @@ def test_ast_parser_with_full_example():
             // In such an ambiguous, decreased-indentation case, where it's unclear how to parse the first line because the line which follows it shares the same indentation level, the first line is FORCED to become a heading. Subsequent lines in this block are forced to be indented. In effect, this makes this block with exactly the same structure as the one before it; an h2 line, followed by a paragraph starter.
     """)
     parsed_spaceup_ast = parse_spaceup_ast(full_input)
-    expected_ast = ...
+    expected_ast = Document(
+        children=[
+            Heading(level=1, content=MarkdownInline(text="text with 0 indentation", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(
+                        content=MarkdownInline(text="text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know.", tokens=[]),
+                        inline_comment=(
+                            "hint: the following non-WS, non-comment element's indentation level is LOWER OR EQUAL to this one; therefore, this line is a paragraph open."
+                        ),
+                    ),
+                    ParagraphLine(content=MarkdownInline(text="another line with more text with 1 indentation.", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="even some more text with 1 indentation, preceded by a blank line, and next non-whitespace, non-comment element has indentation LOWER OR EQUAL to this one  --> this is a paragraph open.", tokens=[]), inline_comment=None)
+                ]
+            ),
+            Heading(level=2, content=MarkdownInline(text="here is a new line with 1 indentation, preceded by a blank line, BUT, next non-WS non comment element has a greater indentation level. Therefore, this is a H2.", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="Some paragraph opener under the H2 heading from before, with an indentation level of 2.", tokens=[]), inline_comment=None),
+                    ParagraphLine(content=MarkdownInline(text="Lorem ipsum a new div in the same paragraph because no blank line before it and indent level is also 2.", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="Foo text after a blank line with same indentation (2) as the preceding text; it is another paragraph opener under the H2 from before.", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Heading(level=2, content=MarkdownInline(text="Back to indentation level 1. Note that the next line has a greater indentation than the current one. This necessarily makes this line a heading.", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="This line has indentation level 2. Because 1 is LOWER THAN 2, the previous line is a heading (h2), and since the next element has a LOWER indentation level, this is a paragraph start with a single div.", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Heading(level=2, content=MarkdownInline(text="Back to indentation level 1. Next line has the same indentation.", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="Here is another line, right afterwards, with the SAME indentation level (1). This is a special case; read the comment below.", tokens=[]), inline_comment=None),
+                ]
+            ),
+        ]
+    )
     assert _assert_ast_equal(parsed_spaceup_ast, expected_ast)
     # expected_html = textwrap.dedent("""
     #     <h1>text with 0 indentation</h1>
@@ -379,7 +558,36 @@ def test_ast_parser_with_markdown_features():
                 Enjoy your [cake](https://example.com/recipe)!
     """)
     parsed_spaceup_ast = parse_spaceup_ast(full_input)
-    expected_ast = ...
+    expected_ast = Document(
+        children=[
+            Heading(level=1, content=MarkdownInline(text="My Favorite Recipe", tokens=[])),
+            Heading(level=2, content=MarkdownInline(text="Ingredients", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="- 2 cups flour", tokens=[]), inline_comment=None),
+                    ParagraphLine(content=MarkdownInline(text="- 1 cup sugar", tokens=[]), inline_comment=None),
+                    ParagraphLine(content=MarkdownInline(text="- **1 tsp** baking powder", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="Mix them well.", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Heading(level=2, content=MarkdownInline(text="Instructions", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="Preheat oven to 350°F.", tokens=[]), inline_comment=None),
+                    ParagraphLine(content=MarkdownInline(text="Bake for 20 minutes.", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="Enjoy your [cake](https://example.com/recipe)!", tokens=[]), inline_comment=None),
+                ]
+            ),
+        ]
+    )
     assert _assert_ast_equal(parsed_spaceup_ast, expected_ast)
     # spaceup_html = render_ast_to_html(parsed_spaceup_ast)
     # actual_structured_html = BeautifulSoup(spaceup_html, "html.parser")
@@ -429,7 +637,45 @@ def test_ast_parser_with_markdown_features_and_comments():
         """
     )
     parsed_spaceup_ast = parse_spaceup_ast(full_input)
-    expected_ast = ...
+    expected_ast = Document(
+        children=[
+            Heading(level=1, content=MarkdownInline(text="My Favorite Recipe", tokens=[])),
+            Heading(level=2, content=MarkdownInline(text="Ingredients", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="- 2 cups flour", tokens=[]), inline_comment=None),
+                    ParagraphLine(content=MarkdownInline(text="- 1 cup sugar", tokens=[]), inline_comment=None),
+                    ParagraphLine(content=MarkdownInline(text="- **1 tsp** baking powder", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Paragraph(
+                lines=[
+                    ParagraphLine(
+                        content=MarkdownInline(text="Mix them well.", tokens=[]),
+                        inline_comment="note: whisk thoroughly",
+                    ),
+                ]
+            ),
+            Heading(level=2, content=MarkdownInline(text="Instructions", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(
+                        content=MarkdownInline(text="Preheat oven to 350°F.", tokens=[]),
+                        inline_comment="oven temperature",
+                    ),
+                    ParagraphLine(content=MarkdownInline(text="Bake for 20 minutes.", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Paragraph(
+                lines=[
+                    ParagraphLine(
+                        content=MarkdownInline(text="Enjoy your [cake](https://example.com/recipe)!", tokens=[]),
+                        inline_comment="bon appetit",
+                    ),
+                ]
+            ),
+        ]
+    )
     assert _assert_ast_equal(parsed_spaceup_ast, expected_ast)
     # expected_html = textwrap.dedent(
     #     """
@@ -491,7 +737,52 @@ def test_ast_parser_with_full_example_and_markdown_in_paragraphs():
         """
     )
     parsed_spaceup_ast = parse_spaceup_ast(full_input)
-    expected_ast = ...
+    expected_ast = Document(
+        children=[
+            Heading(level=1, content=MarkdownInline(text="text with 0 indentation", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="text with 1 indentation, with **bold** and a link to [site](https://example.com).", tokens=[]), inline_comment=None),
+                    ParagraphLine(content=MarkdownInline(text="another line with more text with 1 indentation and some *emphasis*.", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="even some more text with 1 indentation, preceded by a blank line, and next non-whitespace, non-comment element has indentation LOWER OR EQUAL to this one  --> this is a paragraph open.", tokens=[]), inline_comment=None)
+                ]
+            ),
+            Heading(level=2, content=MarkdownInline(text="here is a new line with 1 indentation, preceded by a blank line, BUT, next non-WS non comment element has a greater indentation level. Therefore, this is a H2.", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="- First step: mix ingredients", tokens=[]), inline_comment=None),
+                    ParagraphLine(content=MarkdownInline(text="- Use **butter** and [sugar](https://example.com/sugar)", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="Some paragraph opener under the H2 heading from before, with an indentation level of 2, and a link to [docs](https://example.com/docs).", tokens=[]), inline_comment=None),
+                    ParagraphLine(content=MarkdownInline(text="Lorem ipsum a new div in the same paragraph because no blank line before it and indent level is also 2 with **strong** text.", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="Foo text after a blank line with same indentation (2) as the preceding text; it is another paragraph opener under the H2 from before with a [link](https://example.com/foo).", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Heading(level=2, content=MarkdownInline(text="Back to indentation level 1. Note that the next line has a greater indentation than the current one. This necessarily makes this line a heading.", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="This line has indentation level 2. Because 1 is LOWER THAN 2, the previous line is a heading (h2), and since the next element has a LOWER indentation level, this is a paragraph start with a single div.", tokens=[]), inline_comment=None),
+                ]
+            ),
+            Heading(level=2, content=MarkdownInline(text="Back to indentation level 1. Next line has the same indentation with *italic* and a link to [spec](https://example.com/spec).", tokens=[])),
+            Paragraph(
+                lines=[
+                    ParagraphLine(content=MarkdownInline(text="Here is another line, right afterwards, with the SAME indentation level (1). This is a special case; read the comment below.", tokens=[]), inline_comment=None),
+                ]
+            ),
+        ]
+    )
     assert _assert_ast_equal(parsed_spaceup_ast, expected_ast)
     # expected_html = textwrap.dedent(
     #     """
