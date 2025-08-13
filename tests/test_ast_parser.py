@@ -18,6 +18,7 @@ from ast_parser import (
     Paragraph,
     MarkdownInline,
     ParagraphLine,
+    Comment,
 )
 
 
@@ -84,6 +85,14 @@ def test_ast_parser_with_basic_example():
                     ),
                 ]
             ),
+            Comment(text="This text block is the first example where the two following conditions occur:"),
+            Comment(text="1. indentation went DOWN (previous non-ws non-comment element was 2; now it's 1), and"),
+            Comment(text="2. Two consecutive elements have the same indentation level (1), and going by rules, the first line of this block — 'Back to indentation level 1' — shouldn't be a heading. But we have to make an exception here."),
+            Comment(text="In such an ambiguous, decreased-indentation case, where it's unclear how to parse the first line because the line which follows it shares the same indentation level, the first line is FORCED to become a heading. Subsequent lines in this block are forced to be indented. In effect, this makes this block with exactly the same structure as the one before it; an h2 line, followed by a paragraph starter."),
+            Comment(text="This text block is the first example where the two following conditions occur:"),
+            Comment(text="1. indentation went DOWN (previous non-ws non-comment element was 2; now it's 1), and"),
+            Comment(text="2. Two consecutive elements have the same indentation level (1), and going by rules, the first line of this block — 'Back to indentation level 1' — shouldn't be a heading. But we have to make an exception here."),
+            Comment(text="In such an ambiguous, decreased-indentation case, where it's unclear how to parse the first line because the line which follows it shares the same indentation level, the first line is FORCED to become a heading. Subsequent lines in this block are forced to be indented. In effect, this makes this block with exactly the same structure as the one before it; an h2 line, followed by a paragraph starter."),
         ]
     )
     assert parsed_spaceup_ast == expected_ast
@@ -123,6 +132,14 @@ def test_ast_parser_with_end_of_document_paragraph():
                     ),
                 ]
             ),
+            Comment(text="This text block is the first example where the two following conditions occur:"),
+            Comment(text="1. indentation went DOWN (previous non-ws non-comment element was 2; now it's 1), and"),
+            Comment(text="2. Two consecutive elements have the same indentation level (1), and going by rules, the first line of this block — 'Back to indentation level 1' — shouldn't be a heading. But we have to make an exception here."),
+            Comment(text="In such an ambiguous, decreased-indentation case, where it's unclear how to parse the first line because the line which follows it shares the same indentation level, the first line is FORCED to become a heading. Subsequent lines in this block are forced to be indented. In effect, this makes this block with exactly the same structure as the one before it; an h2 line, followed by a paragraph starter."),
+            Comment(text="This text block is the first example where the two following conditions occur:"),
+            Comment(text="1. indentation went DOWN (previous non-ws non-comment element was 2; now it's 1), and"),
+            Comment(text="2. Two consecutive elements have the same indentation level (1), and going by rules, the first line of this block — 'Back to indentation level 1' — shouldn't be a heading. But we have to make an exception here."),
+            Comment(text="In such an ambiguous, decreased-indentation case, where it's unclear how to parse the first line because the line which follows it shares the same indentation level, the first line is FORCED to become a heading. Subsequent lines in this block are forced to be indented. In effect, this makes this block with exactly the same structure as the one before it; an h2 line, followed by a paragraph starter."),
         ]
     )
     assert parsed_spaceup_ast == expected_ast
