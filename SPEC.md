@@ -11,7 +11,7 @@ Besides this:
 
 ### Example 1: Basic Structure
 
-```
+```sup
 text with 0 indentation
     text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know.
     another line with more text with 1 indentation.
@@ -22,14 +22,14 @@ Equivalent to:
 ```html
 <h1>text with 0 indentation</h1>
 <p>
-<div>text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know.</div>
-<div>another line with more text with 1 indentation.</div>
+text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know.<br>
+another line with more text with 1 indentation.<br>
 </p>
 ```
 
 ### Example 2: End of Document Paragraph
 
-```
+```sup
 text with 0 indentation
     text with 1 indentation. 1 is greater than the preceding 0, and that's the last element in the document (next is EOF) --> this text is a paragraph opener, and the preceding element is an h1.
 ```
@@ -39,13 +39,13 @@ Equivalent to:
 ```html
 <h1>text with 0 indentation</h1>
 <p>
-<div>text with 1 indentation. 1 is greater than the preceding 0, and that's the last element in the document (next is EOF) --> this text is a paragraph opener, and the preceding element is an h1.</div>
+text with 1 indentation. 1 is greater than the preceding 0, and that's the last element in the document (next is EOF) --> this text is a paragraph opener, and the preceding element is an h1.<br>
 </p>
 ```
 
 ### Example 3: Multiple Paragraphs and Headings
 
-```
+```sup
 text with 0 indentation
 
     text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know. // hint: the following non-WS, non-comment element's indentation level is LOWER OR EQUAL to this one; therefore, this line is a paragraph open.
@@ -76,27 +76,27 @@ Equivalent to:
 ```html
 <h1>text with 0 indentation</h1>
 <p>
-  <div>text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know.  <!-- hint: the following non-WS, non-comment element's indentation level is LOWER OR EQUAL to this one; therefore this line is a paragraph open. --></div>
-  <div>another line with more text with 1 indentation.</div>
+  text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know.  <!-- hint: the following non-WS, non-comment element's indentation level is LOWER OR EQUAL to this one; therefore this line is a paragraph open. --><br>
+  another line with more text with 1 indentation.<br>
 </p>
 <p>
-  <div>even some more text with 1 indentation, preceded by a blank line, and next non-whitespace, non-comment element has indentation LOWER OR EQUAL to this one  --> this is a paragraph open.</div>
+  even some more text with 1 indentation, preceded by a blank line, and next non-whitespace, non-comment element has indentation LOWER OR EQUAL to this one  --> this is a paragraph open.<br>
 </p>
 <h2>here is a new line with 1 indentation, preceded by a blank line, BUT, next non-WS non comment element has a greater indentation level. Therefore, this is a H2.</h2>
 <p>
-  <div>Some paragraph opener under the H2 heading from before, with an indentation level of 2.</div>
-  <div>Lorem ipsum a new div in the same paragraph because no blank line before it and indent level is also 2.</div>
+  Some paragraph opener under the H2 heading from before, with an indentation level of 2.<br>
+  Lorem ipsum a new div in the same paragraph because no blank line before it and indent level is also 2.<br>
 </p>
 <p>
-  <div>Foo text after a blank line with same indentation (2) as the preceding text; it is another paragraph opener under the H2 from before.</div>
+  Foo text after a blank line with same indentation (2) as the preceding text; it is another paragraph opener under the H2 from before.<br>
 </p>
 <h2>Back to indentation level 1. Note that the next line has increased indentation.</h2>
 <p>
-  <div>This line has indentation level 2. Because 1 is LOWER THAN 2, the previous line is a heading (h2), and since the next element has a LOWER indentation level, this is a paragraph start with a single div.</div>
+  This line has indentation level 2. Because 1 is LOWER THAN 2, the previous line is a heading (h2), and since the next element has a LOWER indentation level, this is a paragraph start with a single div.<br>
 </p>
 <h2>Back to indentation level 1. Next line has the same indentation.</h2>
 <p>
-  <div>Here is another line, right afterwards, with the SAME indentation level (1). This is a special case; read the comment below.</div>
+  Here is another line, right afterwards, with the SAME indentation level (1). This is a special case; read the comment below.<br>
 </p>
 <!-- This text block is the first example where the two following conditions occur: -->
 <!-- 1. indentation went DOWN (previous non-ws non-comment element was 2; now it's 1), and -->
@@ -106,7 +106,7 @@ Equivalent to:
 
 ### Toy Example: With Markdown Features
 
-```
+```sup
 My Favorite Recipe
 
     Ingredients
@@ -125,4 +125,3 @@ My Favorite Recipe
         Enjoy your [cake](https://example.com/recipe)!
 ```
 
-This demonstrates an H1, multiple H2s, a list, bold text, and a link. The paragraphs under Ingredients and Instructions use indentation to form structures.
