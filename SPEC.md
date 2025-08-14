@@ -1,11 +1,6 @@
 # Spaceup Spec
 
-## Intro
-
-Spaceup utilizes indentation for structure and hierarchy, translating it to headings.
-Besides this:
-- It supports all but niche Markdown features, sans `#` headings and indented blocks
-- Supports `//` comments
+Spaceup is Markdown with `//` comments and indentation for document structure, replacing `#` headings.
 
 ## Examples
 
@@ -115,13 +110,48 @@ My Favorite Recipe
         - 1 cup sugar
         - **1 tsp** baking powder
 
-        Mix them well.
+        Mix them well. // note: whisk thoroughly
 
     Instructions
 
-        Preheat oven to 350°F.
+        Preheat oven to 350°F. // oven temperature
         Bake for 20 minutes.
 
-        Enjoy your [cake](https://example.com/recipe)!
+        Enjoy your [cake](https://example.com/recipe)! // bon appetit
+
 ```
+
+Equivalent to:
+
+```html
+<h1>My Favorite Recipe</h1>
+<h2>Ingredients</h2>
+<ul>
+    <li>2 cups flour</li>
+    <li>1 cup sugar</li>
+    <li><strong>1 tsp</strong> baking powder</li>
+</ul>
+<p>
+    Mix them well.  <!-- note: whisk thoroughly --><br>
+</p>
+<h2>Instructions</h2>
+<p>
+    Preheat oven to 350°F.  <!-- oven temperature --><br>
+    Bake for 20 minutes.<br>
+</p>
+<p>
+    Enjoy your <a href="https://example.com/recipe">cake</a>!  <!-- bon appetit --><br>
+</p>
+```
+
+## Spaceup is a Markdown Superset\*
+
+All Markdown features are supported, except for `#` headings and indented blocks.
+
+
+
+
+
+
+
 
