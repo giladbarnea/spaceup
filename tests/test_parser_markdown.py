@@ -6,7 +6,6 @@ within Spaceup documents. They are ordered from most common to least common feat
 """
 
 import textwrap
-from pathlib import Path
 
 from bs4 import BeautifulSoup
 from bs4.element import Tag, NavigableString, Comment
@@ -51,7 +50,6 @@ def test_bold_text():
         Bold test
             Here is some **bold** text.
     """)
-    Path("tests/data/markdown_bold.txt").write_text(input_text)
     
     expected_html = textwrap.dedent("""
         <h1>Bold test</h1>
@@ -59,7 +57,6 @@ def test_bold_text():
             Here is some <strong>bold</strong> text.<br>
         </p>
     """)
-    Path("tests/data/markdown_bold.html").write_text(expected_html)
     
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
@@ -73,7 +70,6 @@ def test_italic_text():
         Italic test
             Here is some *italic* text.
     """)
-    Path("tests/data/markdown_italic.txt").write_text(input_text)
     
     expected_html = textwrap.dedent("""
         <h1>Italic test</h1>
@@ -81,7 +77,6 @@ def test_italic_text():
             Here is some <em>italic</em> text.<br>
         </p>
     """)
-    Path("tests/data/markdown_italic.html").write_text(expected_html)
     
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
@@ -95,7 +90,6 @@ def test_url_links():
         Links test
             Visit [GitHub](https://github.com) for more info.
     """)
-    Path("tests/data/markdown_url_links.txt").write_text(input_text)
     
     expected_html = textwrap.dedent("""
         <h1>Links test</h1>
@@ -103,7 +97,6 @@ def test_url_links():
             Visit <a href="https://github.com">GitHub</a> for more info.<br>
         </p>
     """)
-    Path("tests/data/markdown_url_links.html").write_text(expected_html)
     
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
@@ -117,7 +110,6 @@ def test_inline_code():
         Code test
             Use the `print()` function to output text.
     """)
-    Path("tests/data/markdown_inline_code.txt").write_text(input_text)
     
     expected_html = textwrap.dedent("""
         <h1>Code test</h1>
@@ -125,7 +117,6 @@ def test_inline_code():
             Use the <code>print()</code> function to output text.<br>
         </p>
     """)
-    Path("tests/data/markdown_inline_code.html").write_text(expected_html)
     
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
@@ -141,7 +132,6 @@ def test_unordered_lists():
             - Bananas
             - Oranges
     """)
-    Path("tests/data/markdown_unordered_lists.txt").write_text(input_text)
     
     expected_html = textwrap.dedent("""
         <h1>Shopping list</h1>
@@ -151,7 +141,6 @@ def test_unordered_lists():
             <li>Oranges</li>
         </ul>
     """)
-    Path("tests/data/markdown_unordered_lists.html").write_text(expected_html)
     
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
@@ -167,7 +156,6 @@ def test_ordered_lists():
             2. Second step
             3. Third step
     """)
-    Path("tests/data/markdown_ordered_lists.txt").write_text(input_text)
     
     expected_html = textwrap.dedent("""
         <h1>Steps</h1>
@@ -177,7 +165,6 @@ def test_ordered_lists():
             <li>Third step</li>
         </ol>
     """)
-    Path("tests/data/markdown_ordered_lists.html").write_text(expected_html)
     
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
@@ -189,20 +176,21 @@ def test_code_blocks():
     """Test that ``` creates code blocks."""
     input_text = textwrap.dedent("""
         Code example
-            ```python
+            
+			```python
             def hello():
                 print("Hello, world!")
             ```
     """)
-    Path("tests/data/markdown_code_blocks.txt").write_text(input_text)
     
     expected_html = textwrap.dedent("""
         <h1>Code example</h1>
-        <pre><code class="language-python">def hello():
-    print("Hello, world!")
-</code></pre>
+        <pre>
+			<code class="language-python">def hello():
+				print("Hello, world!")
+			</code>
+		</pre>
     """)
-    Path("tests/data/markdown_code_blocks.html").write_text(expected_html)
     
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
@@ -216,7 +204,6 @@ def test_local_file_references():
         Documentation
             See [README](./README.md) for details.
     """)
-    Path("tests/data/markdown_local_files.txt").write_text(input_text)
     
     expected_html = textwrap.dedent("""
         <h1>Documentation</h1>
@@ -224,7 +211,6 @@ def test_local_file_references():
             See <a href="./README.md">README</a> for details.<br>
         </p>
     """)
-    Path("tests/data/markdown_local_files.html").write_text(expected_html)
     
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
@@ -239,7 +225,6 @@ def test_blockquotes():
             > This is a blockquote.
             > It can span multiple lines.
     """)
-    Path("tests/data/markdown_blockquotes.txt").write_text(input_text)
     
     expected_html = textwrap.dedent("""
         <h1>Quote example</h1>
@@ -248,7 +233,6 @@ def test_blockquotes():
             It can span multiple lines.</p>
         </blockquote>
     """)
-    Path("tests/data/markdown_blockquotes.html").write_text(expected_html)
     
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
@@ -264,7 +248,6 @@ def test_checklists():
             - [ ] Pending task
             - [ ] Another pending task
     """)
-    Path("tests/data/markdown_checklists.txt").write_text(input_text)
     
     expected_html = textwrap.dedent("""
         <h1>Todo list</h1>
@@ -274,7 +257,6 @@ def test_checklists():
             <li><input type="checkbox" disabled> Another pending task</li>
         </ul>
     """)
-    Path("tests/data/markdown_checklists.html").write_text(expected_html)
     
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
@@ -291,7 +273,6 @@ def test_tables():
             | Alice | 30  | New York|
             | Bob   | 25  | Boston  |
     """)
-    Path("tests/data/markdown_tables.txt").write_text(input_text)
     
     expected_html = textwrap.dedent("""
         <h1>Data table</h1>
@@ -317,7 +298,6 @@ def test_tables():
             </tbody>
         </table>
     """)
-    Path("tests/data/markdown_tables.html").write_text(expected_html)
     
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
