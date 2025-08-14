@@ -5,11 +5,11 @@ Note that when comparing HTML, whitespace does NOT matter.
 Hence it is normalized before comparison.
 """
 
+from pathlib import Path
 import textwrap
 
 from bs4 import BeautifulSoup
 from bs4.element import Tag, NavigableString, Comment
-import pytest
 
 from parser import parse_spaceup
 
@@ -51,6 +51,7 @@ def test_parser_with_basic_example():
             text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know.
             another line with more text with 1 indentation.
     """)
+    Path("tests/data/basic_example.txt").write_text(basic_input)
     expected_html = textwrap.dedent("""
         <h1>text with 0 indentation</h1>
         <p>
@@ -58,6 +59,7 @@ def test_parser_with_basic_example():
             another line with more text with 1 indentation.<br>
         </p>
     """)
+    Path("tests/data/basic_example.html").write_text(expected_html)
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(basic_input)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
@@ -69,12 +71,14 @@ def test_parser_with_end_of_document_paragraph():
         text with 0 indentation
             text with 1 indentation. 1 is greater than the preceding 0, and that's the last element in the document (next is EOF) --> this text is a paragraph opener, and the preceding element is an h1.
     """)
+    Path("tests/data/end_of_document_paragraph.txt").write_text(end_of_document_paragraph_input)
     expected_html = textwrap.dedent("""
         <h1>text with 0 indentation</h1>
         <p>
             text with 1 indentation. 1 is greater than the preceding 0, and that's the last element in the document (next is EOF) --> this text is a paragraph opener, and the preceding element is an h1.<br>
         </p>
     """)
+    Path("tests/data/end_of_document_paragraph.html").write_text(expected_html)
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(end_of_document_paragraph_input)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
@@ -97,6 +101,7 @@ def test_parser_with_two_indentation_levels():
 
                 Foo text after a blank line with same indentation (2) as the preceding text; it is another paragraph opener under the H2 from before.
     """)
+    Path("tests/data/two_indentation_levels.txt").write_text(full_input)
     expected_html = textwrap.dedent("""
         <h1>text with 0 indentation</h1>
         <p>
@@ -115,6 +120,7 @@ def test_parser_with_two_indentation_levels():
             Foo text after a blank line with same indentation (2) as the preceding text; it is another paragraph opener under the H2 from before.<br>
         </p>
     """)
+    Path("tests/data/two_indentation_levels.html").write_text(expected_html)
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(full_input)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
@@ -140,6 +146,7 @@ def test_parser_with_unambiguous_decreasing_indentation_level():
             Back to indentation level 1. Note that the next line has a greater indentation than the current one. This necessarily makes this line a heading.
                 This line has indentation level 2. Because 1 is LOWER THAN 2, the previous line is a heading (h2), and since this is the end of the document, this is a paragraph start with a single div.
     """)
+    Path("tests/data/unambiguous_decreasing_indentation_level.txt").write_text(full_input)
     expected_html = textwrap.dedent("""
         <h1>text with 0 indentation</h1>
         <p>
@@ -162,6 +169,7 @@ def test_parser_with_unambiguous_decreasing_indentation_level():
             This line has indentation level 2. Because 1 is LOWER THAN 2, the previous line is a heading (h2), and since this is the end of the document, this is a paragraph start with a single div.<br>
         </p>
     """)
+    Path("tests/data/unambiguous_decreasing_indentation_level.html").write_text(expected_html)
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(full_input)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
@@ -192,6 +200,7 @@ def test_parser_with_ambiguous_decreasing_indentation_level():
             Back to indentation level 1. Next line has the same indentation.
             Here is another line, right afterwards, with the SAME indentation level (1). This is a special case; read the comment below.
     """)
+    Path("tests/data/ambiguous_decreasing_indentation_level.txt").write_text(full_input)
     expected_html = textwrap.dedent("""
         <h1>text with 0 indentation</h1>
         <p>
@@ -218,6 +227,7 @@ def test_parser_with_ambiguous_decreasing_indentation_level():
             Here is another line, right afterwards, with the SAME indentation level (1). This is a special case; read the comment below.<br>
         </p>
     """)
+    Path("tests/data/ambiguous_decreasing_indentation_level.html").write_text(expected_html)
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(full_input)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
@@ -230,6 +240,7 @@ def test_parser_with_comments_sanity():
             text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know. // hint: the following non-WS, non-comment element's indentation level is LOWER OR EQUAL to this one; therefore, this line is a paragraph open.
             another line with more text with 1 indentation.
     """)
+    Path("tests/data/comments_sanity.txt").write_text(full_input)
     expected_html = textwrap.dedent("""
         <h1>text with 0 indentation</h1>
         <p>
@@ -237,6 +248,7 @@ def test_parser_with_comments_sanity():
             another line with more text with 1 indentation.<br>
         </p>
     """)
+    Path("tests/data/comments_sanity.html").write_text(expected_html)
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(full_input)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
@@ -269,6 +281,7 @@ def test_parser_with_full_example():
             // 2. Two consecutive elements have the same indentation level (1), and going by rules, the first line of this block — 'Back to indentation level 1' — shouldn't be a heading. But we have to make an exception here.
             // In such an ambiguous, decreased-indentation case, where it's unclear how to parse the first line because the line which follows it shares the same indentation level, the first line is FORCED to become a heading. Subsequent lines in this block are forced to be indented. In effect, this makes this block with exactly the same structure as the one before it; an h2 line, followed by a paragraph starter.
     """)
+    Path("tests/data/full_example.txt").write_text(full_input)
     expected_html = textwrap.dedent("""
         <h1>text with 0 indentation</h1>
         <p>
@@ -299,6 +312,7 @@ def test_parser_with_full_example():
         <!-- 2. Two consecutive elements have the same indentation level (1), and going by rules, the first line of this block — 'Back to indentation level 1' — shouldn't be a heading. But we have to make an exception here. -->
         <!-- In such an ambiguous, decreased-indentation case, where it's unclear how to parse the first line because the line which follows it shares the same indentation level, the first line is FORCED to become a heading. Subsequent lines in this block are forced to be indented. In effect, this makes this block with exactly the same structure as the one before it; an h2 line, followed by a paragraph starter. -->
     """)
+    Path("tests/data/full_example.html").write_text(expected_html)
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(full_input)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
@@ -324,6 +338,7 @@ def test_parser_with_markdown_features():
 
                 Enjoy your [cake](https://example.com/recipe)!
     """)
+    Path("tests/data/markdown_features.txt").write_text(full_input)
     expected_html = textwrap.dedent("""
         <h1>My Favorite Recipe</h1>
         <h2>Ingredients</h2>
@@ -344,6 +359,7 @@ def test_parser_with_markdown_features():
             Enjoy your <a href="https://example.com/recipe">cake</a>!<br>
         </p>
     """)
+    Path("tests/data/markdown_features.html").write_text(expected_html)
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(full_input)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
@@ -371,6 +387,7 @@ def test_parser_with_markdown_features_and_comments():
                 Enjoy your [cake](https://example.com/recipe)! // bon appetit
         """
     )
+    Path("tests/data/markdown_features_and_comments.txt").write_text(full_input)
     expected_html = textwrap.dedent(
         """
         <h1>My Favorite Recipe</h1>
@@ -393,6 +410,7 @@ def test_parser_with_markdown_features_and_comments():
         </p>
         """
     )
+    Path("tests/data/markdown_features_and_comments.html").write_text(expected_html)
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(full_input)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
@@ -430,6 +448,7 @@ def test_parser_with_full_example_and_markdown_in_paragraphs():
             // In such an ambiguous, decreased-indentation case, where it's unclear how to parse the first line because the line which follows it shares the same indentation level, the first line is FORCED to become a heading. Subsequent lines in this block are forced to be indented. In effect, this makes this block with exactly the same structure as the one before it; an h2 line, followed by a paragraph starter.
         """
     )
+    Path("tests/data/full_example_and_markdown_in_paragraphs.txt").write_text(full_input)
     expected_html = textwrap.dedent(
         """
         <h1>text with 0 indentation</h1>
@@ -466,6 +485,7 @@ def test_parser_with_full_example_and_markdown_in_paragraphs():
         <!-- In such an ambiguous, decreased-indentation case, where it's unclear how to parse the first line because the line which follows it shares the same indentation level, the first line is FORCED to become a heading. Subsequent lines in this block are forced to be indented. In effect, this makes this block with exactly the same structure as the one before it; an h2 line, followed by a paragraph starter. -->
         """
     )
+    Path("tests/data/full_example_and_markdown_in_paragraphs.html").write_text(expected_html)
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(full_input)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
