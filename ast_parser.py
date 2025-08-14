@@ -228,11 +228,6 @@ def render_ast_to_html(ast: Document) -> str:
             # MarkdownBlock not used yet; fallback to paragraph rendering
             pass
 
-    # Emit top-level comments from AST (generated from // lines) as HTML comments
-    for node in ast.children:
-        if isinstance(node, Comment):
-            output.append(f"<!-- {node.text} -->")
-
     return "\n".join(output)
 
 
