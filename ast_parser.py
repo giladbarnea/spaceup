@@ -3,11 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List, Optional, Union
 
-try:
-    # Imported for type hints only; tests won't depend on concrete token values
-    from markdown_it.token import Token  # type: ignore
-except Exception:  # pragma: no cover - fallback for environments without markdown-it
-    Token = object  # type: ignore
+from markdown_it.token import Token  # type: ignore
 
 
 @dataclass
