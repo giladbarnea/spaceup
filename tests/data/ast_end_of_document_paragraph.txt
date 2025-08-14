@@ -1,0 +1,3 @@
+
+text with 0 indentation
+    text with 1 indentation. 1 is greater than the preceding 0, and that's the last element in the document (next is EOF) --> this text is a paragraph opener, and the preceding element is an h1.
