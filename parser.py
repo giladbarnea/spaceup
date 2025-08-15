@@ -48,7 +48,14 @@ def parse_spaceup(input_str):
     def emit_list(items):
         if not items:
             return
-        lis = '\n'.join(f'<li>{render_inline_markdown(text)}</li>' for text in items)
+        lis = ''
+        for text in items:
+            if text.startswith('[ ] '):
+                lis += '<li><input type="checkbox" disabled> ' + render_inline_markdown(text[4:]) + '</li>\n'
+            elif text.startswith('[x] '):
+                lis += '<li><input type="checkbox" checked disabled> ' + render_inline_markdown(text[4:]) + '</li>\n'
+            else:
+                lis += '<li>' + render_inline_markdown(text) + '</li>\n'
         output.append('<ul>')
         output.append(lis)
         output.append('</ul>')
@@ -66,6 +73,32 @@ def parse_spaceup(input_str):
             return
         code_content = '\n'.join(code_lines)
         output.append(f'<pre><code class="language-{language or ""}">{code_content}</code></pre>')
+
+    def emit_blockquote(lines):
+        if not lines:
+            return
+        combined = '\n'.join(line for line in lines)
+        html = mistune.html(combined)
+        output.append(html)
+
+    def emit_table(rows):
+        if not rows or len(rows) < 3:  # Min header, separator, one row
+            return
+        output.append('<table>')
+        # Header
+        output.append('<thead><tr>')
+        for cell in rows[0].split('|')[1:-1]:
+            output.append('<th>' + cell.strip() + '</th>')
+        output.append('</tr></thead>')
+        # Body
+        output.append('<tbody>')
+        for row in rows[2:]:
+            output.append('<tr>')
+            for cell in row.split('|')[1:-1]:
+                output.append('<td>' + cell.strip() + '</td>')
+            output.append('</tr>')
+        output.append('</tbody>')
+        output.append('</table>')
 
     def split_content_and_inline_comment(text):
         stripped = text.lstrip()
@@ -121,22 +154,44 @@ def parse_spaceup(input_str):
                 pos += 1
                 continue  # Skip if no content after stripping
             
+            # Detect fenced code blocks early, before heading/paragraph logic
+            if content.startswith('```'):
+                # Extract language if present
+                language = content[3:].strip() or None
+                code_lines = []
+                pos += 1
+                while pos < len(lines):
+                    next_line = lines[pos]
+                    if next_line.strip().startswith('```'):
+                        pos += 1
+                        break
+                    code_lines.append(next_line[indent:])  # Trim exactly to the opening indent level
+                    pos += 1
+                # Dedent the code block
+                if code_lines:
+                    min_indent = min(len(l) - len(l.lstrip()) for l in code_lines if l.strip())
+                    code_lines = [l[min_indent:] for l in code_lines]
+                emit_code_block(language, code_lines)
+                previous_non_whitespace_indent = indent
+                continue
+
             next_indent = peek_next_indent(pos)
             has_blank_before_next = False
+            is_followed_by_code_block = False
             for i in range(pos + 1, len(lines)):
-                if compute_indent(lines[i]) is not None:
-                    break
-                # Only treat comment lines (non-empty) as separators here; pure blank lines do not force a heading
-                if lines[i].strip():
-                    has_blank_before_next = True
-            
-            is_heading = False
+                stripped = lines[i].lstrip()
+                if not stripped or stripped.startswith('//'):
+                    if stripped:  # Non-empty blank or comment counts as separator
+                        has_blank_before_next = True
+                    continue
+                if stripped.startswith('```'):
+                    is_followed_by_code_block = True
+                break
             ambiguous_decrease = (
                 previous_non_whitespace_indent > indent and next_indent == indent and not has_blank_before_next
             )
-            if next_indent > indent or (next_indent == indent and has_blank_before_next) or ambiguous_decrease:
-                is_heading = True  # Heading if next is greater or same with blank separation
-            
+            is_heading = next_indent > indent or (next_indent == indent and has_blank_before_next) or ambiguous_decrease or is_followed_by_code_block or (next_indent == -1 and pos < len(lines) - 1)
+
             heading_level = len(indent_stack)
             if is_heading:
                 rendered_heading = render_inline_markdown(content)
@@ -198,27 +253,35 @@ def parse_spaceup(input_str):
                     previous_non_whitespace_indent = indent
                     continue
 
-                elif content.startswith('```'):
-                    # Extract language if present
-                    language = content[3:].strip() or None
-                    code_lines = []
+                elif content.startswith('> '):
+                    quote_lines = [content]
                     pos += 1
                     while pos < len(lines):
-                        next_line = lines[pos]
-                        next_indent = compute_indent(next_line)
-                        if next_indent is None:
-                            pos += 1
-                            continue
-                        if next_line.strip().startswith('```'):
-                            pos += 1
+                        next_line_indent = compute_indent(lines[pos])
+                        if next_line_indent != indent:
                             break
-                        code_lines.append(next_line)  # Preserve original line including indent
+                        next_content, _ = split_content_and_inline_comment(lines[pos])
+                        if not next_content.startswith('> '):
+                            break
+                        quote_lines.append(next_content)
                         pos += 1
-                    # Dedent the code block content relative to the minimum indent in the block
-                    if code_lines:
-                        min_indent = min(len(l) - len(l.lstrip()) for l in code_lines if l.strip())
-                        code_lines = [l[min_indent:] if l.strip() else '' for l in code_lines]
-                    emit_code_block(language, code_lines)
+                    emit_blockquote(quote_lines)
+                    previous_non_whitespace_indent = indent
+                    continue
+
+                elif content.startswith('|') and '|' in content[1:]:
+                    table_lines = [content]
+                    pos += 1
+                    while pos < len(lines):
+                        next_line_indent = compute_indent(lines[pos])
+                        if next_line_indent != indent:
+                            break
+                        next_content, _ = split_content_and_inline_comment(lines[pos])
+                        if not next_content.startswith('|') or '|' not in next_content[1:]:
+                            break
+                        table_lines.append(next_content)
+                        pos += 1
+                    emit_table(table_lines)
                     previous_non_whitespace_indent = indent
                     continue
 
