@@ -1,4 +1,5 @@
 import mistune
+import re
 
 
 def parse_spaceup(input_str):
@@ -51,6 +52,20 @@ def parse_spaceup(input_str):
         output.append('<ul>')
         output.append(lis)
         output.append('</ul>')
+
+    def emit_ordered_list(items):
+        if not items:
+            return
+        lis = '\n'.join(f'<li>{render_inline_markdown(text)}</li>' for text in items)
+        output.append('<ol>')
+        output.append(lis)
+        output.append('</ol>')
+
+    def emit_code_block(language, code_lines):
+        if not code_lines:
+            return
+        code_content = '\n'.join(code_lines)
+        output.append(f'<pre><code class="language-{language or ""}">{code_content}</code></pre>')
 
     def split_content_and_inline_comment(text):
         stripped = text.lstrip()
@@ -160,6 +175,50 @@ def parse_spaceup(input_str):
                         items.append(next_content[2:].strip())
                         pos += 1
                     emit_list(items)
+                    previous_non_whitespace_indent = indent
+                    continue
+
+                elif re.match(r'^\d+\.\s', content):
+                    items = []
+                    match = re.match(r'^\d+\.\s(.*)', content)
+                    if match:
+                        items.append(match.group(1).strip())
+                    pos += 1
+                    while pos < len(lines):
+                        next_line_indent = compute_indent(lines[pos])
+                        if next_line_indent != indent:
+                            break
+                        next_content, _next_comment = split_content_and_inline_comment(lines[pos])
+                        match = re.match(r'^\d+\.\s(.*)', next_content)
+                        if not match:
+                            break
+                        items.append(match.group(1).strip())
+                        pos += 1
+                    emit_ordered_list(items)
+                    previous_non_whitespace_indent = indent
+                    continue
+
+                elif content.startswith('```'):
+                    # Extract language if present
+                    language = content[3:].strip() or None
+                    code_lines = []
+                    pos += 1
+                    while pos < len(lines):
+                        next_line = lines[pos]
+                        next_indent = compute_indent(next_line)
+                        if next_indent is None:
+                            pos += 1
+                            continue
+                        if next_line.strip().startswith('```'):
+                            pos += 1
+                            break
+                        code_lines.append(next_line)  # Preserve original line including indent
+                        pos += 1
+                    # Dedent the code block content relative to the minimum indent in the block
+                    if code_lines:
+                        min_indent = min(len(l) - len(l.lstrip()) for l in code_lines if l.strip())
+                        code_lines = [l[min_indent:] if l.strip() else '' for l in code_lines]
+                    emit_code_block(language, code_lines)
                     previous_non_whitespace_indent = indent
                     continue
 
