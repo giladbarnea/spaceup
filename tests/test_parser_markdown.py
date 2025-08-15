@@ -6,7 +6,7 @@ within Spaceup documents. They are ordered from most common to least common feat
 """
 
 import textwrap
-
+from pprint import pformat
 from bs4 import BeautifulSoup
 from bs4.element import Tag, NavigableString, Comment
 
@@ -61,7 +61,11 @@ def test_bold_text():
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
-    assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
+    actual_html_ast = _soup_ast(actual_structured_html)
+    expected_html_ast = _soup_ast(expected_structured_html)
+    actual_html_ast_str = pformat(actual_html_ast, indent=2)
+    expected_html_ast_str = pformat(expected_html_ast, indent=2)
+    assert actual_html_ast_str == expected_html_ast_str
 
 
 def test_italic_text():
@@ -81,7 +85,11 @@ def test_italic_text():
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
-    assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
+    actual_html_ast = _soup_ast(actual_structured_html)
+    expected_html_ast = _soup_ast(expected_structured_html)
+    actual_html_ast_str = pformat(actual_html_ast, indent=2)
+    expected_html_ast_str = pformat(expected_html_ast, indent=2)
+    assert actual_html_ast_str == expected_html_ast_str
 
 
 def test_url_links():
@@ -101,7 +109,11 @@ def test_url_links():
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
-    assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
+    actual_html_ast = _soup_ast(actual_structured_html)
+    expected_html_ast = _soup_ast(expected_structured_html)
+    actual_html_ast_str = pformat(actual_html_ast, indent=2)
+    expected_html_ast_str = pformat(expected_html_ast, indent=2)
+    assert actual_html_ast_str == expected_html_ast_str
 
 
 def test_inline_code():
@@ -121,7 +133,11 @@ def test_inline_code():
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
-    assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
+    actual_html_ast = _soup_ast(actual_structured_html)
+    expected_html_ast = _soup_ast(expected_structured_html)
+    actual_html_ast_str = pformat(actual_html_ast, indent=2)
+    expected_html_ast_str = pformat(expected_html_ast, indent=2)
+    assert actual_html_ast_str == expected_html_ast_str
 
 
 def test_unordered_lists():
@@ -145,7 +161,11 @@ def test_unordered_lists():
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
-    assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
+    actual_html_ast = _soup_ast(actual_structured_html)
+    expected_html_ast = _soup_ast(expected_structured_html)
+    actual_html_ast_str = pformat(actual_html_ast, indent=2)
+    expected_html_ast_str = pformat(expected_html_ast, indent=2)
+    assert actual_html_ast_str == expected_html_ast_str
 
 
 def test_ordered_lists():
@@ -169,7 +189,11 @@ def test_ordered_lists():
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
-    assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
+    actual_html_ast = _soup_ast(actual_structured_html)
+    expected_html_ast = _soup_ast(expected_structured_html)
+    actual_html_ast_str = pformat(actual_html_ast, indent=2)
+    expected_html_ast_str = pformat(expected_html_ast, indent=2)
+    assert actual_html_ast_str == expected_html_ast_str
 
 
 def test_code_blocks():
@@ -195,7 +219,11 @@ def test_code_blocks():
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
-    assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
+    actual_html_ast = _soup_ast(actual_structured_html)
+    expected_html_ast = _soup_ast(expected_structured_html)
+    actual_html_ast_str = pformat(actual_html_ast, indent=2)
+    expected_html_ast_str = pformat(expected_html_ast, indent=2)
+    assert actual_html_ast_str == expected_html_ast_str
 
 
 def test_local_file_references():
@@ -215,7 +243,11 @@ def test_local_file_references():
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
-    assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
+    actual_html_ast = _soup_ast(actual_structured_html)
+    expected_html_ast = _soup_ast(expected_structured_html)
+    actual_html_ast_str = pformat(actual_html_ast, indent=2)
+    expected_html_ast_str = pformat(expected_html_ast, indent=2)
+    assert actual_html_ast_str == expected_html_ast_str
 
 
 def test_blockquotes():
@@ -237,7 +269,11 @@ def test_blockquotes():
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
-    assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
+    actual_html_ast = _soup_ast(actual_structured_html)
+    expected_html_ast = _soup_ast(expected_structured_html)
+    actual_html_ast_str = pformat(actual_html_ast, indent=2)
+    expected_html_ast_str = pformat(expected_html_ast, indent=2)
+    assert actual_html_ast_str == expected_html_ast_str
 
 
 def test_checklists():
@@ -261,7 +297,11 @@ def test_checklists():
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
-    assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
+    actual_html_ast = _soup_ast(actual_structured_html)
+    expected_html_ast = _soup_ast(expected_structured_html)
+    actual_html_ast_str = pformat(actual_html_ast, indent=2)
+    expected_html_ast_str = pformat(expected_html_ast, indent=2)
+    assert actual_html_ast_str == expected_html_ast_str
 
 
 def test_tables():
@@ -302,4 +342,8 @@ def test_tables():
     expected_structured_html = BeautifulSoup(expected_html, "html.parser")
     parsed_spaceup = parse_spaceup(input_text)
     actual_structured_html = BeautifulSoup(parsed_spaceup, "html.parser")
-    assert _soup_ast(expected_structured_html) == _soup_ast(actual_structured_html)
+    actual_html_ast = _soup_ast(actual_structured_html)
+    expected_html_ast = _soup_ast(expected_structured_html)
+    actual_html_ast_str = pformat(actual_html_ast, indent=2)
+    expected_html_ast_str = pformat(expected_html_ast, indent=2)
+    assert actual_html_ast_str == expected_html_ast_str

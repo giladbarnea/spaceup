@@ -59,3 +59,10 @@ Decisions in line with this framework:
 - A Pragmatic Dual-Parser Approach for Python and JS: A two-pronged strategy was chosen: implementing the feature-rich AST + LSP server in Python, treating it as the core engine, and having a separate minimal pure JavaScript library for the browser client, despite the on-paper duplication.
 - Chosen `markdown-it-py` to build the Python AST, because it plans for future portability. `markdown-it-py` has an identical JavaScript counterpart (`markdown-it`), which makes a future port of the parser a simple translation, once again **deduplicating effort** across the project's lifecycle.
 
+## Development
+
+Package management as well as running executables is done with [uv](https://docs.astral.sh/uv/). Not pip, not poetry, not venv.
+
+Tests are run by running the `./test.sh` script (assuming you're in project root). It's a wrapper around `uv run pytest tests`. You can optionally pass pytest arguments to it normally (e.g. `./test.sh -x` or `./test.sh -k "keyword"`).
+
+Python version is 3.13. If relevant, leverage modern Python features (tastefully).
