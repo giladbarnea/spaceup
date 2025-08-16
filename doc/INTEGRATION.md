@@ -432,3 +432,7 @@ Notes
 - Spaceup integration: Choose a consistent plugin set per runtime to keep behavior aligned across Node and Python
 - ⭐ 34 (mdit-py-plugins)
 - ⭐ 1.2k (pymdown-extensions)
+
+---
+
+Note: this article lists many Markdown parsers which aren't here: https://medium.com/@stereobooster/markdown-parsers-ab83dbb5f5c8
