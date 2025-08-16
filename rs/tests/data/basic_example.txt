@@ -1,0 +1,4 @@
+
+text with 0 indentation
+    text with 1 indentation. 1 is greater than the preceding 0, but we need to parse the next element before we know.
+    another line with more text with 1 indentation.
