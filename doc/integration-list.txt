@@ -1,0 +1,80 @@
+Full-Featured Code Editors (All features: highlighting, autocomplete, error squiggles, formatting)
+	Monaco Editor
+	CodeMirror 6 
+
+Syntax Highlighting Only
+	Highlight.js
+	Prism.js
+	Shiki
+
+Rich Text Editors with Code Support
+	CKEditor 5
+	TinyMCE
+	Specialized/Emerging
+	Starry-Night (by GitHub/Wooorm)
+	LDT (Lightweight Decorator for Textareas)
+
+Formatters and Linters
+
+	Linting
+		markdownlint
+		remark-lint (Unified/remark)
+		textlint
+		Formatting
+		Prettier (Markdown)
+		remark
+		remark-stringify
+		mdsf
+
+Server-Side Syntax Highlighting
+	Unified
+	rehype-highlight
+
+Autocomplete & Error Squiggles (LSP/Services)
+	prosemd-lsp
+	vscode-markdown-languageservice
+
+Python
+	Linting
+		PyMarkdown (pymarkdown)
+		proselint
+	
+	Formatting
+		mdformat
+	
+	Server-Side Syntax Highlighting
+		Pygments
+		markdown-it-py
+		mistune
+	
+	Autocomplete & Error Squiggles
+		Cross-Platform / CLI Tools
+			Vale
+
+Server-Side Runtime Markdown Libraries
+	Node.js
+		commonmark.js
+		markdown-it
+		remark (Unified)
+		micromark
+		marked
+
+Python
+	commonmark.py: deprecated. Will not integrate.
+	paka.cmark
+	mistletoe
+	markdown-it-py
+	Mistune
+	Python-Markdown
+	markdown2
+
+Notable Extension Packs
+	mdit-py-plugins
+	pymdown-extensions
+	
+Misc
+	monaco-languageclient
+	mdast
+	vfile
+	remark-parse
+	
