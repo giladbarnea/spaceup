@@ -1,0 +1,17 @@
+
+My Favorite Recipe
+
+    Ingredients
+
+        - 2 cups flour
+        - 1 cup sugar
+        - **1 tsp** baking powder
+
+        Mix them well.
+
+    Instructions
+
+        Preheat oven to 350°F.
+        Bake for 20 minutes.
+
+        Enjoy your [cake](https://example.com/recipe)!
