@@ -12,7 +12,7 @@ We explored formal grammars and found a vanilla CFG ill-suited because Spaceup�
 Spaceup intentionally has **two** parsing implementations that accept the same language and must produce the **same HTML**:
 
 - **Lightweight Parser (`parser.py`)** — a practical, manual parser (recursive descent with string/regex matching). This is the basis for tiny/browser use cases (e.g., syntax highlighting with Prism/Highlight.js via a CDN). It does **not** build a full AST.
-- **AST Parser (`ast_parser.py`)** — a robust, AST-first implementation that underpins advanced tooling (LSP, formatting, diagnostics, preview, etc.).
+- **AST Parser (`ast_parser.py`)** — a robust, AST-first implementation that underpins advanced tooling (LSP, formatting, diagnostics, conversions, in-editor preview, etc.).
 
 Both parsers are language-identical and must round-trip to **the same HTML**.
 
@@ -84,13 +84,11 @@ To guarantee parity and portability:
 
 ## Roadmap
 
-> Order of operations; no dates. Each step should keep HTML parity between parsers and advance shared test coverage.
-
 1. **Spec & Fixtures**
    - Finalize the **shared AST spec** and publish JSON/HTML fixtures.
 
 2. **Core Engine (Python)**
-   - Implement/solidify **AST parser** and **LSP** (diagnostics, formatting incl. forced indents, highlighting, auto-indent, autocomplete, preview).
+   - Implement/solidify **AST parser** and **LSP** (diagnostics, formatting incl. forced indents, highlighting, auto-indent, autocomplete, conversions, in-editor preview).
    - Ship **CLI** and **server** surfaces that use the same core.
 
 3. **Lightweight Parser Parity**
