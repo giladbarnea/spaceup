@@ -110,6 +110,6 @@ Equivalent implementations of the AST parser and tests exist in `js/` and `rs/` 
 
 ### Development
 
-- Package management and executables use **[uv](https://docs.astral.sh/uv/)** (not pip/poetry/venv).
+- Package management and executables use **[uv](https://docs.astral.sh/uv/)**.
 - Run tests via `./test.sh`, a wrapper for `uv run pytest tests` (supports normal pytest args like `-x` or `-k "keyword").
 - Python **3.13**; use modern features tastefully.

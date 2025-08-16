@@ -1,5 +1,8 @@
 "use strict";
 
+const MarkdownIt = require("markdown-it");
+const md = new MarkdownIt();
+
 function clampHeadingDepth(level) {
   if (level < 1) return 1;
   if (level > 6) return 6;
@@ -20,7 +23,8 @@ function breakNode() {
 
 function inlineTextToChildren(text) {
   if (!text) return [];
-  return [textNode(text)];
+  const html = md.renderInline(String(text)).trim();
+  return [{ type: "html", value: html }];
 }
 
 function paragraphLinesAreBulleted(lines) {
@@ -59,7 +63,8 @@ function paragraphToMdast(paragraph) {
     const line = paragraph.lines[i];
     children.push(...inlineTextToChildren(line?.content?.text ?? ""));
     if (line.inline_comment) children.push(htmlCommentNode(line.inline_comment));
-    if (i < paragraph.lines.length - 1) children.push(breakNode());
+    // Always add a trailing line break to match Spaceup's HTML fixtures
+    children.push(breakNode());
   }
   return { type: "paragraph", children };
 }
