@@ -338,3 +338,56 @@ FunctionDecl { "function" identifier "(" ")" Block }
 Notes
 - In all cases, Spaceup can adapt its AST to the format each tool expects (Markdown string or `mdast`)
 - Diagnostics and suggestions from these tools can be surfaced through the Spaceup LSP to provide highlighting, linting, autocomplete, error squiggles, and formatting experiences in editors
+
+---
+
+# Server-Side Runtime Markdown Libraries
+
+## Node.js
+
+### markdown-it
+- What it is: Modern, pluggable CommonMark parser for Node.js
+- Capabilities: Fast; rich plugin ecosystem (attrs, anchor, footnote, emoji, containers); token stream with positions; custom renderers; GFM via plugins
+- Spaceup integration: Node twin of `markdown-it-py` for parity; parse Markdown segments inside Spaceup paragraphs → HTML or token stream; reuse the same plugin set across runtimes
+
+### remark (Unified)
+- What it is: Plugin-based Markdown processor (`remark-parse` → `mdast` → `remark-rehype` → HTML)
+- Capabilities: Deep transform pipelines on `mdast`, GFM support, frontmatter, interop with `rehype` (HTML) and broader Unified ecosystem
+- Spaceup integration: Convert Spaceup AST → `mdast` or Markdown → run remark pipeline (incl. rehype) → HTML; ideal when structural transforms are desired
+
+### micromark
+- What it is: Low-level CommonMark tokenizer underlying remark/unified
+- Capabilities: Concrete tokens with precise positions, extension system for syntax additions, strict compliance
+- Spaceup integration: Use where exact token boundaries/positions are needed for LSP features on embedded Markdown; higher effort than high-level parsers
+
+### marked
+- What it is: High-performance Markdown parser with GFM support
+- Capabilities: Very fast parsing/rendering, simple API, broad adoption
+- Spaceup integration: Lightweight option to render embedded Markdown to HTML when minimal dependencies and speed are the priority
+
+## Python
+
+### markdown-it-py
+- What it is: Python port of `markdown-it`
+- Capabilities: CommonMark-compliant; token stream with positions; ecosystem via `mdit-py-plugins` (tables, anchors, attrs, footnotes, etc.)
+- Spaceup integration: Already used by the AST parser; embed token streams in Spaceup AST nodes for editor features; align plugins with Node’s `markdown-it` for cross-runtime parity
+
+### Mistune
+- What it is: Fast, extensible Python Markdown parser
+- Capabilities: Pluggable architecture, custom renderers, GFM features, easy server-side HTML generation
+- Spaceup integration: Used by the lightweight parser; good default for quick server rendering of Markdown segments
+
+### Python-Markdown
+- What it is: Mature, widely-used Markdown implementation with an extension system
+- Capabilities: Stable API, extensive plugins; pairs well with `pymdown-extensions`
+- Spaceup integration: Alternative runtime for rendering emitted Markdown; leverage extension ecosystem where needed
+
+### markdown2
+- What it is: Simple, fast Markdown implementation with optional "extras" (e.g., metadata, footnotes)
+- Capabilities: Speed and simplicity; toggle features via extras
+- Spaceup integration: Minimal-dependency renderer for embedded Markdown when advanced plugins aren’t required
+
+### Notable Extension Packs
+- `mdit-py-plugins` (Python): Official/curated plugins for `markdown-it-py` (tables, anchors, attrs, task lists, etc.)
+- `pymdown-extensions` (Python): Large extension suite for `Python-Markdown` (e.g., superfences, task lists, tabbed blocks, details)
+- Spaceup integration: Choose a consistent plugin set per runtime to keep behavior aligned across Node and Python
