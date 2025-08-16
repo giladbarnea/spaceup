@@ -69,16 +69,16 @@ description: This document lists every technology that consumes Markdown, which 
 
 ## Summary by Capability
 
-| Library       | Highlighting | Autocomplete | Error Squiggles | Formatting | Popularity |
-| ------------- | ------------ | ------------ | --------------- | ---------- | ---------- |
-| Monaco Editor | ✅            | ✅            | ✅               | ✅          | Very High  |
-| CodeMirror 6  | ✅            | ✅            | ✅               | ✅          | Very High  |
-| Highlight.js  | ✅            | ❌            | ❌               | ❌          | Very High  |
-| Prism.js      | ✅            | ❌            | ❌               | ❌          | Very High  |
-| Shiki         | ✅            | ❌            | ❌               | ❌          | High       |
-| CKEditor 5    | ✅*           | ❌            | ❌               | ❌          | High       |
-| TinyMCE       | ✅*           | ❌            | ❌               | ❌          | High       |
-| Starry-Night  | ✅            | ❌            | ❌               | ❌          | Moderate   |
+| Library       | Highlighting | Autocomplete | Error Squiggles | Formatting |
+| ------------- | ------------ | ------------ | --------------- | ---------- |
+| Monaco Editor | ✅            | ✅            | ✅               | ✅          |
+| CodeMirror 6  | ✅            | ✅            | ✅               | ✅          |
+| Highlight.js  | ✅            | ❌            | ❌               | ❌          |
+| Prism.js      | ✅            | ❌            | ❌               | ❌          |
+| Shiki         | ✅            | ❌            | ❌               | ❌          |
+| CKEditor 5    | ✅*           | ❌            | ❌               | ❌          |
+| TinyMCE       | ✅*           | ❌            | ❌               | ❌          |
+| Starry-Night  | ✅            | ❌            | ❌               | ❌          |
 
 *Code blocks only, not full documents
 
@@ -203,30 +203,6 @@ FunctionDecl { "function" identifier "(" ")" Block }
    - Format: Language Server Protocol
    - Standardized but limited adoption
 
-## Strategic Implications for Spaceup
-
-### Target Priorities Based on Format Standardization:
-
-#### Tier 1: TextMate Grammar (Best ROI)
-- Libraries: Shiki, Starry-Night, Monaco Editor
-- Effort: Medium (one grammar file)
-- Reach: High (VS Code ecosystem compatibility)
-
-#### Tier 2: Simple Token Adapters 
-- Libraries: Highlight.js, Prism.js  
-- Effort: Low (simple adapters from AST)
-- Reach: Very High (most popular)
-
-#### Tier 3: Parser Integration
-- Libraries: CodeMirror 6
-- Effort: High (Lezer grammar)
-- Reach: Medium-High
-
-#### Tier 4: LSP 
-- Libraries: Monaco Editor, CodeMirror 6
-- Effort: Very High (full language server)
-- Reach: Medium (but high-value users)
-
 ---
 
 # Editors (as plugins)
@@ -278,7 +254,7 @@ FunctionDecl { "function" identifier "(" ")" Block }
 #### mdsf
 - What it is: Formats fenced code blocks inside Markdown using your configured code formatters
 - Capabilities: Keeps embedded code consistent with project formatters
-- Spaceup integration: After emitting Markdown, run mdsf to format code blocks
+- Spaceup integration: After emitting Markdown, run `mdsf` to format code blocks
 - ⭐ 84
 
 ### Server-Side Syntax Highlighting
@@ -338,8 +314,14 @@ FunctionDecl { "function" identifier "(" ")" Block }
 #### Pygments
 - What it is: Mature syntax highlighter for many languages (Python library)
 - Capabilities: Highlighting for fenced code blocks during HTML generation
-- Spaceup integration: Walk Spaceup AST for code blocks → Pygments → embed highlighted HTML
+- Spaceup integration: Write a dedicated Lexer.
 - ⭐ 1.8k
+
+#### Rich
+- What it is: Python library for rich text and console output with terminal colors and styles
+- Capabilities: Rich text formatting, terminal colors, styles, and more
+- Spaceup integration: Write a dedicated Theme and feed Pygments Lexer.
+- ⭐ 53.3k
 
 #### markdown-it-py / mistune (with custom highlighter)
 - What it is: Markdown parsers that can delegate code block highlighting to Pygments
