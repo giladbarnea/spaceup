@@ -1,0 +1,5 @@
+# JavaScript
+js/node_modules/
+
+# Rust
+rs/target/
