@@ -345,6 +345,11 @@ Notes
 
 ## Node.js
 
+### commonmark.js
+- What it is: Official JavaScript reference implementation of the CommonMark spec
+- Capabilities: Parses to AST and renders HTML/XML; strict spec compliance; predictable positions
+- Spaceup integration: Use when strict CommonMark behavior is required or for baseline tests; less extensible than plugin ecosystems
+
 ### markdown-it
 - What it is: Modern, pluggable CommonMark parser for Node.js
 - Capabilities: Fast; rich plugin ecosystem (attrs, anchor, footnote, emoji, containers); token stream with positions; custom renderers; GFM via plugins
@@ -366,6 +371,19 @@ Notes
 - Spaceup integration: Lightweight option to render embedded Markdown to HTML when minimal dependencies and speed are the priority
 
 ## Python
+
+### commonmark.py: deprecated. Won't integrate.
+- What it is: Pure Python port of `commonmark.js` adhering to the CommonMark spec (now deprecated)
+
+### paka.cmark
+- What it is: Python bindings to the C reference implementation `cmark`
+- Capabilities: Fast and strictly compliant; multiple outputs (HTML, XML, CommonMark, man, LaTeX)
+- Spaceup integration: Option when strict compliance/performance is critical and C bindings are acceptable in the deployment environment
+
+### mistletoe
+- What it is: Pure Python, CommonMark-compliant Markdown parser
+- Capabilities: Extensible architecture; supports alternative renderers (e.g., LaTeX); easy installation (no C deps)
+- Spaceup integration: Pure-Python CommonMark option when plugin parity with `markdown-it(-py)` isn’t needed
 
 ### markdown-it-py
 - What it is: Python port of `markdown-it`
