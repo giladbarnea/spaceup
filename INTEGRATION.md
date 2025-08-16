@@ -1,6 +1,6 @@
 ---
 title: Integrations
-description: This document lists all planned integrations with Spaceup, grouped by environment (Browser, Node.js, Python). Within each environment, integrations are further grouped by the expected language definition format. Ultimately, bespoke adaptors will be written for each integration.
+description: This document lists every technology that consumes Markdown, which Spaceup plans to integrate with. The list is grouped by environment (Browser, Node.js, Python). Within each environment, integrations are further grouped by the expected language definition format. Ultimately, bespoke adaptors will be written for each integration.
 ---
 
 # Browser
@@ -221,9 +221,120 @@ FunctionDecl { "function" identifier "(" ")" Block }
 
 ---
 
+# Editors (as plugins)
+
+- VS Code
+- JetBrains IDEs
+
+---
+
 # Formatters and Linters
 
 ## Node.js
 
+### Linting
+
+#### markdownlint
+- What it is: Popular Markdown style checker/linter (CLI + Node API)
+- Capabilities: Linting, configurable rulesets, JSON output, CI-friendly
+- Spaceup integration: Emit Markdown from Spaceup AST (or `mdast`) → run markdownlint → map findings to LSP diagnostics
+
+#### remark-lint (Unified/remark)
+- What it is: Linting via remark plugins in the Unified ecosystem
+- Capabilities: Extensive rule packs, custom rules, `vfile` messages; works with GFM/frontmatter
+- Spaceup integration: Adapt Spaceup AST → `mdast` → run remark + remark-lint → surface diagnostics
+
+#### textlint
+- What it is: Pluggable text/Markdown/HTML linter for prose and style
+- Capabilities: Grammar/style rules, custom rule authoring, JSON output
+- Spaceup integration: Feed paragraph text (via Markdown emission) to textlint; merge messages into diagnostics
+
+### Formatting
+
+#### Prettier (Markdown)
+- What it is: Opinionated formatter with first-class Markdown support
+- Capabilities: Canonical formatting for Markdown content and code fences
+- Spaceup integration: Emit Markdown from Spaceup AST → Prettier → (optionally) compare/apply formatting suggestions
+
+#### remark + remark-stringify
+- What it is: Unified pipeline that can normalize Markdown on stringify
+- Capabilities: Structural normalization and consistent spacing via options/plugins
+- Spaceup integration: Produce `mdast` from Spaceup AST → stringify with desired options
+
+#### mdsf
+- What it is: Formats fenced code blocks inside Markdown using your configured code formatters
+- Capabilities: Keeps embedded code consistent with project formatters
+- Spaceup integration: After emitting Markdown, run mdsf to format code blocks
+
+### Server-Side Syntax Highlighting
+
+#### Unified + rehype-highlight
+- What it is: Markdown → HTML pipeline with server-side code block highlighting
+- Capabilities: Highlighting during HTML generation; themeable via highlight.js grammars
+- Spaceup integration: Emit Markdown/`mdast` → `remark-rehype` → `rehype-highlight` → HTML
+
+#### Shiki
+- What it is: High-fidelity, VS Code grammar/theme based highlighter (Node runtime)
+- Capabilities: Deterministic, theme-accurate highlighting for fenced code blocks
+- Spaceup integration: Walk Spaceup AST for code blocks → call Shiki → inject highlighted HTML
+
+### Autocomplete & Error Squiggles (LSP/Services)
+
+#### prosemd-lsp
+- What it is: Proofreading/linting Language Server for Markdown
+- Capabilities: Diagnostics (error squiggles), style hints, some completions via LSP
+- Spaceup integration: Optionally run alongside Spaceup LSP; or ingest its diagnostics for prose/style
+
+#### vscode-markdown-languageservice
+- What it is: Embeddable services powering VS Code’s Markdown features
+- Capabilities: Link/reference completions, diagnostics, folding, workspace features
+- Spaceup integration: Use as a library where helpful; or replicate needed features on Spaceup AST
 
 ## Python
+
+### Linting
+
+#### PyMarkdown (pymarkdown)
+- What it is: Markdown linter with a comprehensive rule set (CLI and library)
+- Capabilities: Style/correctness checks, configurable rules, JSON output
+- Spaceup integration: Emit Markdown from Spaceup AST → run pymarkdown → convert results to diagnostics
+
+#### proselint
+- What it is: Prose/style linter for English text
+- Capabilities: Grammar/style suggestions for natural language inside documents
+- Spaceup integration: Feed paragraph text to proselint; surface messages as informational diagnostics
+
+### Formatting
+
+#### mdformat
+- What it is: CommonMark-compliant Markdown formatter (built on markdown-it-py)
+- Capabilities: Consistent Markdown formatting; plugin ecosystem (e.g., GFM)
+- Spaceup integration: Emit Markdown from Spaceup AST → run mdformat → apply or preview changes
+
+### Server-Side Syntax Highlighting
+
+#### Pygments
+- What it is: Mature syntax highlighter for many languages (Python library)
+- Capabilities: Highlighting for fenced code blocks during HTML generation
+- Spaceup integration: Walk Spaceup AST for code blocks → Pygments → embed highlighted HTML
+
+#### markdown-it-py / mistune (with custom highlighter)
+- What it is: Markdown parsers that can delegate code block highlighting to Pygments
+- Capabilities: Inline Markdown parsing (already used by Spaceup) plus hookable highlighting
+- Spaceup integration: Reuse existing markdown-it-py usage; attach a Pygments-based highlighter for code fences
+
+### Autocomplete & Error Squiggles
+
+- LSP wiring via Spaceup core
+  - Approach: Use linter outputs (pymarkdown/proselint) to produce LSP diagnostics; offer completions based on Spaceup AST (links, refs) and optionally reuse external services
+
+## Cross-Platform / CLI Tools
+
+#### Vale
+- What it is: Syntax-aware prose/style linter that works well with Markdown
+- Capabilities: Consistent editorial style enforcement; customizable rule sets
+- Spaceup integration: Run on Markdown emitted from Spaceup AST; merge diagnostics
+
+Notes
+- In all cases, Spaceup can adapt its AST to the format each tool expects (Markdown string or `mdast`)
+- Diagnostics and suggestions from these tools can be surfaced through the Spaceup LSP to provide highlighting, linting, autocomplete, error squiggles, and formatting experiences in editors
