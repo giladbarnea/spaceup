@@ -3,6 +3,7 @@
 Spaceup is Markdown with comments and indentation for structure.
 
 The document hierarchy is clear at a glance, both when editing and when viewing the rendered version.
+
 Thus, scrolling up to count hashes is no longer needed.
 
 ## Examples
