@@ -1,8 +1,9 @@
 # Spaceup
 
-Spaceup is a semi-structured markup language favoring simplicity and readability of both source code and output.
+Spaceup is Markdown with comments and indentation for structure.
 
-It supports document structure while having only a single syntactical rule.
+The document hierarchy is clear at a glance, both when editing and when viewing the rendered version.
+Thus, scrolling up to count hashes is no longer needed.
 
 ## Examples
 
