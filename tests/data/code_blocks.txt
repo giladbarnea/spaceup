@@ -1,0 +1,7 @@
+
+        Code example
+
+			```python
+            def hello():
+                print("Hello, world!")
+            ```
