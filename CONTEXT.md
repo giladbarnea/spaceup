@@ -1,68 +1,113 @@
 ---
-last-updated: 2025-08-13
+last-updated: 2025-08-16
 last-commit-at-writing: f5ea521800
 ---
 
 ### Project Genesis and Parsing Strategy
 
-The project, "Spaceup," was defined as a Markdown alternative where document structure (headings, paragraphs) is determined by relative indentation rather than symbols like `#`. The initial discussion established the core parsing rules, including how indentation, blank lines, and `//` comments dictate the hierarchy.
+Spaceup is a Markdown alternative where **document structure** (headings, paragraphs) is determined by **relative indentation**, not symbols like `#`. Blank lines and `//` comments participate in the hierarchy rules.
 
-After exploring formal grammars, we concluded that a standard Context-Free Grammar (CFG) was ill-suited due to Spaceup's context-sensitive nature (requiring lookahead and state to track indentation). We decided on a more practical approach: a **hand-written recursive descent parser**. This strategy was chosen for its simplicity and, crucially, its ability to delegate the parsing of standard Markdown features (like bold, lists, and links) to existing, trusted libraries, thereby minimizing implementation effort. An initial Python prototype validated this approach but also highlighted the need for a more robust internal representation to handle complex cases correctly.
+We explored formal grammars and found a vanilla CFG ill-suited because Spaceup’s indentation requires look-ahead and state. We therefore adopted a **hand-written recursive-descent approach**.
 
-### The Shift to AST and a Centralized Language Server (LSP)
+Spaceup intentionally has **two** parsing implementations that accept the same language and must produce the **same HTML**:
 
-To enable powerful static analysis features—a key goal for making Spaceup a usable language—we determined that the parser must produce an **Abstract Syntax Tree (AST)**. This structured representation is a prerequisite for the desired functionalities:
-* **Error Highlighting**: Squiggly lines for syntax errors (e.g., invalid indentation).
-* **Auto-Formatting**: Automatically correcting indentation.
-* **Syntax Highlighting**: Applying colors to different language elements.
-* **Intelligent Auto-Indentation**: Smart cursor placement, similar to Python editors.
+- **Lightweight Parser (`parser.py`)** — a practical, manual parser (recursive descent with string/regex matching). This is the basis for tiny/browser use cases (e.g., syntax highlighting with Prism/Highlight.js via a CDN). It does **not** build a full AST.
+- **AST Parser (`ast_parser.py`)** — a robust, AST-first implementation that underpins advanced tooling (LSP, formatting, diagnostics, preview, etc.).
 
-To avoid duplicating the analysis logic across different editors (VS Code, PyCharm) and platforms (CLI, potential plugins), we decided the core of the project would be a **Language Server Protocol (LSP) server**. This server will act as the single "analysis engine," built in Python, which is your preferred language.
+Both parsers are language-identical and must round-trip to **the same HTML**.
 
-### Dual-Parser Approach: Python for Power, JS for Simplicity
+### Markdown Inside Spaceup Paragraphs
 
-A key concern was providing simple, lightweight syntax highlighting for web browsers (e.g., via a CDN script) without the overhead of the full LSP or a Python runtime. We settled on a pragmatic, two-pronged approach:
+We reuse proven Markdown tooling for inline/block features **inside paragraphs** rather than reinventing them.
 
-1.  **Python-based AST and LSP (The Core Engine)**: The primary implementation will be in Python. This includes the full parser that generates a detailed AST and the LSP server that provides all advanced static analysis features.
-2.  **Lightweight JavaScript Library (For Browsers)**: A separate, minimal, pure-JS parser will be created for simple browser use cases. This library will focus solely on basic syntax highlighting and will not initially build a full AST, ensuring it remains small and fast. It is completely independent of the LSP.
+- In the **lightweight parser**, we use **mistune** for inline Markdown.
+- In the **AST parser**, we use **`markdown-it-py`**, whose token stream is embedded directly into Spaceup AST nodes. Its JavaScript twin (**`markdown-it`**) keeps future parity straightforward.
 
-This strategy allows for both a feature-rich editing experience in IDEs and a simple, performant solution for web pages, while keeping the development efforts for each use case separate and manageable.
+**Unsupported on purpose (to avoid ambiguity with Spaceup’s indentation semantics):**
+- `#`-style Markdown headings are **not recognized** by Spaceup.
+- **Indented code blocks** (the old 4-space style) are **not recognized**.
+(Use fenced code blocks in Markdown segments if/when needed; structure still comes from Spaceup indentation.)
 
-### Selecting the Right Markdown Library for AST Integration
+### AST, LSP, and the Editing Experience
 
-The final decision point was choosing a Python library to parse the Markdown content within Spaceup paragraphs. The goal was to find a library that could provide a Markdown AST (or a token stream) that could be embedded directly into the main Spaceup AST. This avoids the need to define custom AST nodes for Markdown features like `Bold` or `OrderedList`.
+To enable serious editor features, the AST parser produces a structured **AST** consumed by a **Language Server Protocol (LSP)** server (Python, likely via `pygls`). The LSP is the single “analysis engine” used by VS Code, PyCharm, a CLI, and other clients.
 
-To minimize the friction of a potential future port to JavaScript, the chosen library needed a direct, API-compatible counterpart in the JS ecosystem.
+Planned capabilities (AST/LSP-driven):
+- **Diagnostics**: syntax errors with squigglies (e.g., invalid indentation).
+- **Formatting**: canonical indentation and **application of “forced indents”** where the parser disambiguates.
+- **Syntax Highlighting** and **Auto-Indent on Enter**.
+- **Autocomplete** and **intelligent cursor motions** where applicable.
+- **Preview/Rendering** similar to Markdown preview.
+- **Plugin hooks** for common linters/formatters in both ecosystems.
 
-After evaluating alternatives, **`markdown-it-py`** was selected as the ideal tool.
-* It provides a **token stream** that can be directly embedded into the Spaceup AST nodes.
-* It has an **identical JavaScript twin, `markdown-it`**, which will make a future JS implementation of the parser a straightforward translation.
+### Browser Support (Tiny JS)
 
-This choice perfectly aligns with the project's core principle of reusing existing tools and planning for cross-language consistency to curb redundant effort.
+For web pages, we’ll ship a **small, pure-JS library** that mirrors the **lightweight parser** to power simple highlighting (non-AST) from a CDN. It’s independent of the LSP. A future bridge to advanced features is optional.
 
----
+### Converters and Output Strategy
 
+Spaceup is converted to **HTML** first. HTML is the intermediate representation we rely on for rendering and for further conversions (e.g., to Markdown/other formats) as needed. Rendering HTML is a solved problem.
 
-### Decision-making Framework
+### Decision-Making Framework
 
-A few core principles designed to maximize progress for a solo developer on a side project
+Principles optimized for solo, part-time development:
 
-* **Conservative, High-Impact Prioritization:** Every decision is weighed against a framework of **"high impact x sensible to do now x low effort as a tie-breaker."** This ensures that work is focused and avoids premature optimization or overly ambitious features.
-* **Aggressive Effort Deduplication:** A central tenet is to **"collapse branches"** of potential work by finding the one effort that would serve multiple purposes, thus avoiding having to do one thing in multiple ways. This applies both to building things and to broader strategic decisions. This is a conscious strategy to curb the "combinatorial explosion" of tasks and avoid having to do something over and over in small variations.
-* **Leverage Proven Tools:** A strong preference was shown for learning from and **reusing trusted, existing libraries** (like established Markdown parsers) rather than reinventing the wheel. This lowers the implementation burden and builds on battle-tested solutions.
-* **Plan for Future Portability:** Decisions are made with an eye toward minimizing the friction of future reimplementations in other languages (specifically JavaScript). This involves choosing tools and designing structures (like the AST) that have clear, API-compatible counterparts in other ecosystems.
+- **Conservative, High-Impact Prioritization**: Do the high-impact thing that’s sensible now; break ties by low effort.
+- **Aggressive Effort Deduplication**: Collapse branches—build one thing that serves many surfaces (e.g., one LSP feeds many editors).
+- **Leverage Proven Tools**: Reuse trusted Markdown parsers (mistune, markdown-it-py/markdown-it).
+- **Plan for Portability**: Maintain a shared AST spec to make a future JS port low-friction.
 
-Decisions in line with this framework:
-- delegating all in-paragraph Markdown parsing to an existing library.
-- writing an AST+LSP in Python, which is language-agnostic. An example of "collapsing branches." Instead of creating separate plugins for VS Code, PyCharm, a CLI, etc., one LSP server is built to "serve them all widely," embodying the principle of aggressive effort deduplication.
-- when time comes, we'll render Spaceup by converting to HTML first, then render the HTML, thus avoiding the sprawling rabbit hole of trying to render Spaceup directly.
-- A Pragmatic Dual-Parser Approach for Python and JS: A two-pronged strategy was chosen: implementing the feature-rich AST + LSP server in Python, treating it as the core engine, and having a separate minimal pure JavaScript library for the browser client, despite the on-paper duplication.
-- Chosen `markdown-it-py` to build the Python AST, because it plans for future portability. `markdown-it-py` has an identical JavaScript counterpart (`markdown-it`), which makes a future port of the parser a simple translation, once again **deduplicating effort** across the project's lifecycle.
+Examples:
+- Delegate all in-paragraph Markdown parsing to existing libraries.
+- Keep Python as the **source of truth** for CLI, server, and LSP.
+- Two parsers, one language: lightweight for browsers; AST for tooling—same HTML result.
+- Convert Spaceup → HTML, then go anywhere.
 
-## Development
+### Shared Specification & Tests
 
-Package management as well as running executables is done with [uv](https://docs.astral.sh/uv/). Not pip, not poetry, not venv.
+To guarantee parity and portability:
+- A **shared AST spec** (documented shapes/types).
+- **Common fixtures**: input Spaceup → expected AST (JSON) → expected HTML.
+- Cross-runner tests to keep Python and future JS implementations aligned.
 
-Tests are run by running the `./test.sh` script (assuming you're in project root). It's a wrapper around `uv run pytest tests`. You can optionally pass pytest arguments to it normally (e.g. `./test.sh -x` or `./test.sh -k "keyword"`).
+### Distribution & Tooling
 
-Python version is 3.13. If relevant, leverage modern Python features (tastefully).
+- **Python**: package and publish on **PyPI**; CLI and LSP server live here.
+- **JavaScript**: package on **npm**; ship a **CDN** build for the lightweight browser parser.
+- Editor clients (e.g., VS Code) are thin wrappers over the LSP.
+
+### Development
+
+- Package management and executables use **[uv](https://docs.astral.sh/uv/)** (not pip/poetry/venv).
+- Run tests via `./test.sh`, a wrapper for `uv run pytest tests` (supports normal pytest args like `-x` or `-k "keyword").
+- Python **3.13**; use modern features tastefully.
+
+## Roadmap
+
+> Order of operations; no dates. Each step should keep HTML parity between parsers and advance shared test coverage.
+
+1. **Spec & Fixtures**
+   - Finalize the **shared AST spec** and publish JSON/HTML fixtures.
+
+2. **Core Engine (Python)**
+   - Implement/solidify **AST parser** and **LSP** (diagnostics, formatting incl. forced indents, highlighting, auto-indent, autocomplete, preview).
+   - Ship **CLI** and **server** surfaces that use the same core.
+
+3. **Lightweight Parser Parity**
+   - Ensure the **lightweight parser** matches language semantics and **emits identical HTML** to the AST path.
+
+4. **Editors**
+   - VS Code extension (standard LSP client); add PyCharm/others as needed.
+
+5. **Browser Library**
+   - Publish the **tiny JS parser** (non-AST) for highlighting; integrate easily with Prism/Highlight.js; CDN build.
+
+6. **Shared Tests Across Runtimes**
+   - Reuse fixtures to validate Python and JS builds against the same inputs/outputs.
+
+7. **Converters & Packaging**
+   - Treat **Spaceup → HTML** as canonical; add ancillary conversions from HTML as needed.
+   - Publish to **PyPI**/**npm**/**CDN**.
+
+8. **Optional**
+   - Explore a **JS LSP** port (e.g., `vscode-languageserver-node`) if demand warrants; reuse AST spec and fixtures.
