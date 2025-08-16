@@ -76,11 +76,9 @@ To guarantee parity and portability:
 - **JavaScript**: package on **npm**; ship a **CDN** build for the lightweight browser parser.
 - Editor clients (e.g., VS Code) are thin wrappers over the LSP.
 
-### Development
+## Multi-Language Implementations
 
-- Package management and executables use **[uv](https://docs.astral.sh/uv/)** (not pip/poetry/venv).
-- Run tests via `./test.sh`, a wrapper for `uv run pytest tests` (supports normal pytest args like `-x` or `-k "keyword").
-- Python **3.13**; use modern features tastefully.
+Equivalent implementations of the AST parser and tests exist in `js/` and `rs/` alongside the Python version. We intend to replace the Python core with Rust over time, while the JS version exists to support Node and browser environments.
 
 ## Roadmap
 
@@ -109,3 +107,9 @@ To guarantee parity and portability:
 
 8. **Optional**
    - Explore a **JS LSP** port (e.g., `vscode-languageserver-node`) if demand warrants; reuse AST spec and fixtures.
+
+### Development
+
+- Package management and executables use **[uv](https://docs.astral.sh/uv/)** (not pip/poetry/venv).
+- Run tests via `./test.sh`, a wrapper for `uv run pytest tests` (supports normal pytest args like `-x` or `-k "keyword").
+- Python **3.13**; use modern features tastefully.
