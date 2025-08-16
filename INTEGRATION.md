@@ -69,16 +69,16 @@ description: This document lists every technology that consumes Markdown, which 
 
 ## Summary by Capability
 
-| Library | Highlighting | Autocomplete | Error Squiggles | Formatting | Popularity |
-|---------|-------------|-------------|----------------|------------|------------|
-| Monaco Editor | ✅ | ✅ | ✅ | ✅ | Very High |
-| CodeMirror 6 | ✅ | ✅ | ✅ | ✅ | Very High |
-| Highlight.js | ✅ | ❌ | ❌ | ❌ | Very High |
-| Prism.js | ✅ | ❌ | ❌ | ❌ | Very High |
-| Shiki | ✅ | ❌ | ❌ | ❌ | High |
-| CKEditor 5 | ✅* | ❌ | ❌ | ❌ | High |
-| TinyMCE | ✅* | ❌ | ❌ | ❌ | High |
-| Starry-Night | ✅ | ❌ | ❌ | ❌ | Moderate |
+| Library       | Highlighting | Autocomplete | Error Squiggles | Formatting | Popularity |
+| ------------- | ------------ | ------------ | --------------- | ---------- | ---------- |
+| Monaco Editor | ✅            | ✅            | ✅               | ✅          | Very High  |
+| CodeMirror 6  | ✅            | ✅            | ✅               | ✅          | Very High  |
+| Highlight.js  | ✅            | ❌            | ❌               | ❌          | Very High  |
+| Prism.js      | ✅            | ❌            | ❌               | ❌          | Very High  |
+| Shiki         | ✅            | ❌            | ❌               | ❌          | High       |
+| CKEditor 5    | ✅*           | ❌            | ❌               | ❌          | High       |
+| TinyMCE       | ✅*           | ❌            | ❌               | ❌          | High       |
+| Starry-Night  | ✅            | ❌            | ❌               | ❌          | Moderate   |
 
 *Code blocks only, not full documents
 
