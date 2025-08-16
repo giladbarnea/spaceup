@@ -9,8 +9,11 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "vitest": "^2.0.5",
-    "jsdom": "^24.1.1"
+    "hast-util-to-html": "^9.0.5",
+    "jsdom": "^24.1.1",
+    "mdast-util-to-hast": "^13.2.0",
+    "unified": "^11.0.5",
+    "vitest": "^2.0.5"
   },
   "dependencies": {
     "markdown-it": "^14.1.0"
