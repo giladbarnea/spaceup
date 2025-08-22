@@ -44,3 +44,7 @@ Recommended for readers looking for high-velocity strategy and thought-provoking
 
 - Supports all but niche Markdown features, minus `#` headings and indented blocks
 - Supports `//` comments
+
+## Implementations
+
+Equivalent implementations of the AST parser and tests exist in `js/` and `rs/` alongside the Python version. We intend to replace the Python core with Rust over time, while the JS version exists to support Node and browser environments.
